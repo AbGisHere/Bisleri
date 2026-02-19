@@ -1,0 +1,24 @@
+{
+  "name": "@bisleri/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@bisleri/db": "workspace:*",
+    "@bisleri/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@bisleri/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

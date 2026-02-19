@@ -1,0 +1,43 @@
+{
+  "name": "bisleri",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "dotenv": "^17.2.2",
+      "zod": "^4.1.13",
+      "typescript": "^5",
+      "better-auth": "^1.4.18"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter '*' build",
+    "check-types": "bun run --filter '*' check-types",
+    "dev:native": "bun run --filter native dev",
+    "dev:web": "bun run --filter web dev",
+    "db:push": "bun run --filter @bisleri/db db:push",
+    "db:studio": "bun run --filter @bisleri/db db:studio",
+    "db:generate": "bun run --filter @bisleri/db db:generate",
+    "db:migrate": "bun run --filter @bisleri/db db:migrate",
+    "db:start": "bun run --filter @bisleri/db db:start",
+    "db:watch": "bun run --filter @bisleri/db db:watch",
+    "db:stop": "bun run --filter @bisleri/db db:stop",
+    "db:down": "bun run --filter @bisleri/db db:down"
+  },
+  "dependencies": {
+    "@bisleri/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@bisleri/config": "workspace:*",
+    "@types/node": "^22.13.14",
+    "typescript": "catalog:"
+  },
+  "packageManager": "bun@1.3.9"
+}
