@@ -14,36 +14,41 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (session.user.role === "seller") {
-    const [productsResult] = await db
-      .select({ count: count() })
-      .from(product)
-      .where(and(eq(product.sellerId, session.user.id), eq(product.status, "active")));
+  try {
+    if (session.user.role === "seller") {
+      const [productsResult] = await db
+        .select({ count: count() })
+        .from(product)
+        .where(and(eq(product.sellerId, session.user.id), eq(product.status, "active")));
 
-    const [activeOrdersResult] = await db
+      const [activeOrdersResult] = await db
+        .select({ count: count() })
+        .from(order)
+        .where(
+          and(
+            eq(order.sellerId, session.user.id),
+            ne(order.status, "delivered"),
+            ne(order.status, "returned"),
+          ),
+        );
+
+      return NextResponse.json({
+        products: productsResult?.count ?? 0,
+        activeOrders: activeOrdersResult?.count ?? 0,
+      });
+    }
+
+    // buyer
+    const [ordersResult] = await db
       .select({ count: count() })
       .from(order)
-      .where(
-        and(
-          eq(order.sellerId, session.user.id),
-          ne(order.status, "delivered"),
-          ne(order.status, "returned"),
-        ),
-      );
+      .where(eq(order.buyerId, session.user.id));
 
     return NextResponse.json({
-      products: productsResult?.count ?? 0,
-      activeOrders: activeOrdersResult?.count ?? 0,
+      orders: ordersResult?.count ?? 0,
     });
+  } catch (err) {
+    console.error("[GET /api/stats]", err);
+    return NextResponse.json({ products: 0, activeOrders: 0, orders: 0 });
   }
-
-  // buyer
-  const [ordersResult] = await db
-    .select({ count: count() })
-    .from(order)
-    .where(eq(order.buyerId, session.user.id));
-
-  return NextResponse.json({
-    orders: ordersResult?.count ?? 0,
-  });
 }

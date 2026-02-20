@@ -16,34 +16,39 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const orders = await db
-    .select({
-      id: order.id,
-      status: order.status,
-      quantity: order.quantity,
-      totalAmount: order.totalAmount,
-      buyerAddress: order.buyerAddress,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
-      productId: order.productId,
-      productName: product.name,
-      productLocation: product.location,
-      buyerId: order.buyerId,
-      buyerName: user.name,
-      sellerId: order.sellerId,
-    })
-    .from(order)
-    .leftJoin(product, eq(order.productId, product.id))
-    .leftJoin(user, eq(order.buyerId, user.id))
-    .where(
-      session.user.role === "seller"
-        ? eq(order.sellerId, session.user.id)
-        : eq(order.buyerId, session.user.id),
-    )
-    .orderBy(desc(order.createdAt))
-    .limit(50);
+  try {
+    const orders = await db
+      .select({
+        id: order.id,
+        status: order.status,
+        quantity: order.quantity,
+        totalAmount: order.totalAmount,
+        buyerAddress: order.buyerAddress,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        productId: order.productId,
+        productName: product.name,
+        productLocation: product.location,
+        buyerId: order.buyerId,
+        buyerName: user.name,
+        sellerId: order.sellerId,
+      })
+      .from(order)
+      .leftJoin(product, eq(order.productId, product.id))
+      .leftJoin(user, eq(order.buyerId, user.id))
+      .where(
+        session.user.role === "seller"
+          ? eq(order.sellerId, session.user.id)
+          : eq(order.buyerId, session.user.id),
+      )
+      .orderBy(desc(order.createdAt))
+      .limit(50);
 
-  return NextResponse.json({ orders });
+    return NextResponse.json({ orders });
+  } catch (err) {
+    console.error("[GET /api/orders]", err);
+    return NextResponse.json({ error: "Failed to load orders" }, { status: 500 });
+  }
 }
 
 const createOrderSchema = z.object({
@@ -64,44 +69,47 @@ export async function POST(request: Request) {
   const parsed = createOrderSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Invalid data", issues: parsed.error.flatten().fieldErrors },
-      { status: 400 },
-    );
+    const firstError = Object.values(parsed.error.flatten().fieldErrors).flat()[0] ?? "Invalid data";
+    return NextResponse.json({ error: firstError }, { status: 400 });
   }
 
   const { productId, quantity, buyerAddress } = parsed.data;
 
-  const [p] = await db.select().from(product).where(eq(product.id, productId));
+  try {
+    const [p] = await db.select().from(product).where(eq(product.id, productId));
 
-  if (!p) {
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
-  }
-  if (p.status !== "active") {
-    return NextResponse.json({ error: "Product is no longer available" }, { status: 409 });
-  }
-  if (p.sellerId === session.user.id) {
-    return NextResponse.json({ error: "Cannot order your own product" }, { status: 400 });
-  }
-  if (p.quantity < quantity) {
-    return NextResponse.json({ error: "Not enough stock" }, { status: 409 });
-  }
+    if (!p) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+    if (p.status !== "active") {
+      return NextResponse.json({ error: "Product is no longer available" }, { status: 409 });
+    }
+    if (p.sellerId === session.user.id) {
+      return NextResponse.json({ error: "Cannot order your own product" }, { status: 400 });
+    }
+    if (p.quantity < quantity) {
+      return NextResponse.json({ error: "Not enough stock" }, { status: 409 });
+    }
 
-  const totalAmount = (parseFloat(p.price) * quantity).toFixed(2);
+    const totalAmount = (parseFloat(p.price) * quantity).toFixed(2);
 
-  const [created] = await db
-    .insert(order)
-    .values({
-      id: crypto.randomUUID(),
-      productId,
-      buyerId: session.user.id,
-      sellerId: p.sellerId,
-      quantity,
-      totalAmount,
-      buyerAddress,
-      status: "pending",
-    })
-    .returning({ id: order.id });
+    const [created] = await db
+      .insert(order)
+      .values({
+        id: crypto.randomUUID(),
+        productId,
+        buyerId: session.user.id,
+        sellerId: p.sellerId,
+        quantity,
+        totalAmount,
+        buyerAddress,
+        status: "pending",
+      })
+      .returning({ id: order.id });
 
-  return NextResponse.json({ order: created }, { status: 201 });
+    return NextResponse.json({ order: created }, { status: 201 });
+  } catch (err) {
+    console.error("[POST /api/orders]", err);
+    return NextResponse.json({ error: "Failed to place order. Please try again." }, { status: 500 });
+  }
 }

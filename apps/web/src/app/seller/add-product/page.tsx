@@ -72,6 +72,7 @@ export default function AddProductPage() {
           quantity: Number(formData.quantity),
           location: formData.location,
           demandScale: formData.demandScale || undefined,
+          imageUrl: formData.imagePreview || undefined,
         }),
       });
       if (!res.ok) {
@@ -110,7 +111,7 @@ export default function AddProductPage() {
         <div className="mt-5 h-[3px] w-10 rounded-full bg-terracotta" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-12">
+      <form onSubmit={handleSubmit} noValidate className="space-y-12">
 
         {/* Image */}
         <div>
