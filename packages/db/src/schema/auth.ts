@@ -20,10 +20,13 @@ export const user = pgTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   role: text("role").default("seller"),
+  onboardingComplete: boolean("onboarding_complete").default(false),
   age: integer("age"),
   location: text("location"),
   skills: text("skills"),
-  onboardingComplete: boolean("onboarding_complete").default(false),
+  interests: text("interests"),
+  shgName: text("shg_name"),
+  memberCount: integer("member_count"),
 });
 
 export const session = pgTable(
