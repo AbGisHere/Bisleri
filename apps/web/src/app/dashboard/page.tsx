@@ -2,8 +2,6 @@ import { auth } from "@bisleri/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import Dashboard from "./dashboard";
-
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -17,5 +15,12 @@ export default async function DashboardPage() {
     redirect("/onboarding");
   }
 
-  return <Dashboard session={session} />;
+  const role = session.user.role || "seller";
+  const target =
+    role === "buyer"
+      ? "/buyer/dashboard"
+      : role === "shg"
+        ? "/shg/dashboard"
+        : "/seller/dashboard";
+  redirect(target);
 }

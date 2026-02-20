@@ -5,17 +5,29 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
+import { authClient } from "@/lib/auth-client";
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
 
 export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { data: session } = authClient.useSession();
+
+  const role = session?.user?.role || "seller";
+  const dashboardHref =
+    !session
+      ? "/dashboard"
+      : role === "buyer"
+        ? "/buyer/dashboard"
+        : role === "shg"
+          ? "/shg/dashboard"
+          : "/seller/dashboard";
 
   const links = [
-    { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dashboard" },
-  ] as const;
+    { to: "/" as string, label: "Home" },
+    { to: dashboardHref as string, label: "Dashboard" },
+  ];
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/50">
@@ -32,11 +44,14 @@ export default function Header() {
 
           <nav className="hidden md:flex items-center gap-1">
             {links.map(({ to, label }) => {
-              const active = pathname === to;
+              const active =
+                to === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(to);
               return (
                 <Link
-                  key={to}
-                  href={to}
+                  key={label}
+                  href={to as "/"}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     active
                       ? "bg-primary/10 text-primary"
@@ -64,11 +79,14 @@ export default function Header() {
         {mobileOpen && (
           <nav className="md:hidden pb-4 flex flex-col gap-1">
             {links.map(({ to, label }) => {
-              const active = pathname === to;
+              const active =
+                to === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(to);
               return (
                 <Link
-                  key={to}
-                  href={to}
+                  key={label}
+                  href={to as "/"}
                   onClick={() => setMobileOpen(false)}
                   className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     active
