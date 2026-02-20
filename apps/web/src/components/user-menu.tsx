@@ -22,7 +22,7 @@ export default function UserMenu() {
     return (
       <Link
         href="/login"
-        className="h-10 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium flex items-center hover:opacity-90 transition-opacity"
+        className="h-10 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium flex items-center hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
       >
         Sign In
       </Link>
