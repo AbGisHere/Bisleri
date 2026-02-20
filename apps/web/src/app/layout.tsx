@@ -15,7 +15,7 @@ const dmSerif = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Bisleri - Rural Women's Marketplace",
+  title: "Rangaayan - Rural Women's Marketplace",
   description:
     "Empowering rural women entrepreneurs through a micromarketplace, SHG networks, AI-powered pricing, and demand prediction.",
 };
@@ -36,12 +36,23 @@ export default function RootLayout({
           <div className="min-h-svh flex flex-col">
             <Header />
             <main className="flex-1">{children}</main>
-            <footer className="px-4 sm:px-6 lg:px-8 py-8 border-t border-border/50">
-              <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
-                <span className="font-display font-semibold text-foreground">
-                  Bisleri
-                </span>
-                <span>Empowering rural women across India</span>
+            <footer className="px-4 sm:px-6 lg:px-8 py-10 border-t border-border">
+              <div className="max-w-6xl mx-auto">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <span className="font-display text-lg font-semibold text-foreground">
+                      Rangaayan
+                    </span>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Empowering rural women entrepreneurs across India
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                    <a href="#" className="hover:text-foreground transition-colors">About</a>
+                    <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+                    <a href="#" className="hover:text-foreground transition-colors">Help</a>
+                  </div>
+                </div>
               </div>
             </footer>
           </div>

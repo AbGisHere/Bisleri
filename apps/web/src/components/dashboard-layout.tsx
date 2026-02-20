@@ -56,7 +56,7 @@ export default function DashboardLayout({
 
       <Link
         href={cta.href}
-        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl bg-primary text-primary-foreground dark:bg-primary/10 dark:text-foreground dark:border dark:border-primary/25 mb-10 hover:opacity-95 transition-opacity"
+        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl bg-primary text-primary-foreground dark:bg-primary/20 dark:text-foreground dark:border dark:border-primary/30 mb-10 hover:opacity-95 transition-opacity"
       >
         <div className="flex items-center gap-5">
           <div className="w-14 h-14 rounded-2xl bg-primary-foreground/15 dark:bg-primary/15 flex items-center justify-center">
@@ -64,7 +64,7 @@ export default function DashboardLayout({
           </div>
           <div>
             <div className="text-xl font-semibold">{cta.title}</div>
-            <div className="text-primary-foreground/65 dark:text-muted-foreground text-sm mt-0.5">
+            <div className="text-primary-foreground/80 dark:text-muted-foreground text-sm mt-0.5">
               {cta.desc}
             </div>
           </div>

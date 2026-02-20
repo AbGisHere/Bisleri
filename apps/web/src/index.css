@@ -51,12 +51,12 @@
   --secondary: oklch(0.26 0.025 45);
   --secondary-foreground: oklch(0.88 0.008 70);
   --muted: oklch(0.26 0.025 45);
-  --muted-foreground: oklch(0.62 0.025 55);
+  --muted-foreground: oklch(0.68 0.03 55);
   --accent: oklch(0.62 0.12 85);
   --accent-foreground: oklch(0.14 0.015 45);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 12%);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.68 0.15 38);
   --chart-1: oklch(0.68 0.15 38);
   --chart-2: oklch(0.60 0.12 155);
@@ -69,7 +69,7 @@
   --sidebar-primary-foreground: oklch(0.14 0.015 45);
   --sidebar-accent: oklch(0.26 0.025 45);
   --sidebar-accent-foreground: oklch(0.88 0.008 70);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: oklch(1 0 0 / 14%);
   --sidebar-ring: oklch(0.68 0.15 38);
 }
 
@@ -136,27 +136,3 @@
   }
 }
 
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee 35s linear infinite;
-}
-
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation: none;
-  }
-}

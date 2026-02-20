@@ -72,7 +72,7 @@ export default function SignInForm({
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                className="h-12 rounded-xl px-4 bg-muted/40 border-transparent focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/40"
+                className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
               {field.state.meta.errors.map((error) => (
                 <p key={error?.message} className="text-sm text-destructive">
@@ -94,7 +94,7 @@ export default function SignInForm({
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                className="h-12 rounded-xl px-4 bg-muted/40 border-transparent focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/40"
+                className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
               {field.state.meta.errors.map((error) => (
                 <p key={error?.message} className="text-sm text-destructive">

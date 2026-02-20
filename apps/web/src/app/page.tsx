@@ -58,23 +58,23 @@ function WovenThread({ className }: { className?: string }) {
       <path
         d="M0 30 Q25 5, 50 30 T100 30 T150 30 T200 30"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="2.5"
         strokeLinecap="round"
-        opacity="0.15"
+        opacity="0.25"
       />
       <path
         d="M0 35 Q25 55, 50 35 T100 35 T150 35 T200 35"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
-        opacity="0.1"
+        opacity="0.15"
       />
       <path
         d="M0 25 Q25 0, 50 25 T100 25 T150 25 T200 25"
         stroke="currentColor"
         strokeWidth="1"
         strokeLinecap="round"
-        opacity="0.08"
+        opacity="0.12"
       />
     </svg>
   );
@@ -100,7 +100,7 @@ function FeatureCard({
       initial={{ opacity: 0, y: 24 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
-      className="group rounded-2xl border border-border/60 bg-card p-7 transition-shadow hover:shadow-md hover:shadow-primary/5"
+      className="group rounded-2xl border border-border bg-card p-7 transition-shadow hover:shadow-md hover:shadow-primary/5"
     >
       <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5 transition-colors group-hover:bg-primary/15">
         <Icon className="w-5 h-5 text-primary" />
@@ -111,16 +111,18 @@ function FeatureCard({
   );
 }
 
-function StepCard({
+function StepItem({
   n,
   title,
   desc,
   index,
+  isLast,
 }: {
   n: string;
   title: string;
   desc: string;
   index: number;
+  isLast: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-40px" });
@@ -128,16 +130,21 @@ function StepCard({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 16 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+      initial={{ opacity: 0, x: -16 }}
+      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
       transition={{ duration: 0.45, delay: index * 0.1, ease: "easeOut" }}
-      className="bg-card p-8"
+      className="flex gap-6"
     >
-      <span className="font-display text-4xl font-bold text-primary/20 block mb-6">
-        {n}
-      </span>
-      <h3 className="font-semibold text-lg mb-2">{title}</h3>
-      <p className="text-sm text-muted-foreground">{desc}</p>
+      <div className="flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/15 flex items-center justify-center shrink-0">
+          <span className="font-display text-sm font-bold text-primary">{n}</span>
+        </div>
+        {!isLast && <div className="w-px flex-1 bg-border my-2" />}
+      </div>
+      <div className={isLast ? "pb-0" : "pb-10"}>
+        <h3 className="font-semibold text-lg mb-1">{title}</h3>
+        <p className="text-sm text-muted-foreground">{desc}</p>
+      </div>
     </motion.div>
   );
 }
@@ -207,29 +214,17 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="border-y border-border/60 py-5 overflow-hidden">
-        <div className="marquee-track flex">
-          {[0, 1].map((copy) => (
-            <div key={copy} className="marquee-set flex shrink-0" aria-hidden={copy === 1}>
-              {[
-                "Micromarketplace",
-                "AI-Powered Pricing",
-                "SHG Skills Network",
-                "Demand Prediction",
-                "Logistics & Delivery",
-                "Community Support",
-                "Order Tracking",
-                "Smart Insights",
-              ].map((item) => (
-                <span
-                  key={`${copy}-${item}`}
-                  className="flex items-center gap-3 px-8 text-sm font-medium text-muted-foreground whitespace-nowrap"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                  {item}
-                </span>
-              ))}
-            </div>
+      <section className="border-y border-border py-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-muted-foreground">
+          {[
+            "12 states across India",
+            "AI-powered pricing",
+            "Village-to-doorstep delivery",
+          ].map((stat) => (
+            <span key={stat} className="flex items-center gap-2.5 whitespace-nowrap">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
+              {stat}
+            </span>
           ))}
         </div>
       </section>
@@ -264,7 +259,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="px-4 sm:px-6 lg:px-8 py-24 border-t border-border/60">
+      <section className="px-4 sm:px-6 lg:px-8 py-24 border-t border-border">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-16">
             <h2 className="font-display text-3xl sm:text-4xl font-bold">
@@ -275,9 +270,9 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/60 rounded-2xl overflow-hidden">
+          <div className="space-y-0">
             {STEPS.map((step, i) => (
-              <StepCard key={step.n} index={i} {...step} />
+              <StepItem key={step.n} index={i} {...step} isLast={i === STEPS.length - 1} />
             ))}
           </div>
         </div>
@@ -301,7 +296,7 @@ export default function Page() {
               href="/login"
               className="group/cta inline-flex items-center gap-3 px-10 py-4 rounded-full bg-primary-foreground text-primary dark:bg-primary dark:text-primary-foreground font-bold text-lg hover:shadow-xl hover:shadow-black/10 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
             >
-              Join Bisleri
+              Join Rangaayan
               <ArrowRight className="w-5 h-5 transition-transform group-hover/cta:translate-x-0.5" />
             </Link>
           </div>

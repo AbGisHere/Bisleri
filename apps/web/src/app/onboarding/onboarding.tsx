@@ -216,7 +216,7 @@ export default function Onboarding({ userName }: { userName: string }) {
                   aria-required="true"
                   aria-invalid={ageError ? true : undefined}
                   aria-describedby={ageError ? "age-error" : undefined}
-                  className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-transparent focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/40"
+                  className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
                 />
                 {ageError && (
                   <p id="age-error" role="alert" className="text-sm text-destructive">
@@ -239,7 +239,7 @@ export default function Onboarding({ userName }: { userName: string }) {
                     aria-required="true"
                     aria-invalid={locationError ? true : undefined}
                     aria-describedby={locationError ? "location-error" : undefined}
-                    className="h-14 rounded-2xl pl-12 pr-5 text-lg bg-muted/40 border-transparent focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/40"
+                    className="h-14 rounded-2xl pl-12 pr-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
                   />
                 </div>
                 {locationError && (
