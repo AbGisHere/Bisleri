@@ -1,13 +1,11 @@
-import { auth } from "@bisleri/auth";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+import { getSession } from "@/lib/session";
 
 import SellerDashboard from "./seller-dashboard";
 
 export default async function SellerDashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getSession();
 
   if (!session?.user) {
     redirect("/login");

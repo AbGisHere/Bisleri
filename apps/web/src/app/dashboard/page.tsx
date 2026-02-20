@@ -1,11 +1,9 @@
-import { auth } from "@bisleri/auth";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { getSession } from "@/lib/session";
+
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getSession();
 
   if (!session?.user) {
     redirect("/login");

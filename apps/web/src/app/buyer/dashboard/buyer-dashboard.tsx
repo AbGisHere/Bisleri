@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Store,
   Heart,
@@ -11,16 +10,13 @@ import ShoppingCartIcon from "@/components/ui/shopping-cart-icon";
 import ScanHeartIcon from "@/components/ui/scan-heart-icon";
 import ChartLineIcon from "@/components/ui/chart-line-icon";
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
+import type { Session } from "@/lib/types";
 
 export default function BuyerDashboard({
   session,
 }: {
-  session: typeof authClient.$Infer.Session;
+  session: Session;
 }) {
-  const [isCartHovered, setIsCartHovered] = useState(false);
-  const [isHeartHovered, setIsHeartHovered] = useState(false);
-  const [isChartHovered, setIsChartHovered] = useState(false);
   const firstName = session.user.name.split(" ")[0];
   const hour = new Date().getHours();
   const greeting =
@@ -61,76 +57,61 @@ export default function BuyerDashboard({
           Your Workspace
         </h2>
         <div className="grid sm:grid-cols-2 gap-4">
-          {[
-            {
-              icon: ShoppingCartIcon,
-              title: "My Orders",
-              desc: "Track your purchases",
-              tag: "0 orders",
-              color: "text-primary bg-primary/8 dark:bg-primary/15",
-              isCart: true,
-            },
-            {
-              icon: Heart,
-              title: "Wishlist",
-              desc: "Saved products",
-              tag: "0 saved",
-              color: "text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15",
-              isHeart: true,
-            },
-            {
-              icon: Store,
-              title: "Marketplace",
-              desc: "Browse all products",
-              tag: "Explore",
-              color: "text-primary bg-primary/8 dark:bg-primary/15",
-            },
-            {
-              icon: TrendingUp,
-              title: "Demand Insights",
-              desc: "Trends & forecasts",
-              tag: "Ready",
-              color: "text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15",
-              isChart: true,
-            },
-          ].map((mod) => (
-            <Link
-              key={mod.title}
-              href="#"
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
-              onMouseEnter={() => {
-                if (mod.isCart) setIsCartHovered(true);
-                if (mod.isHeart) setIsHeartHovered(true);
-                if (mod.isChart) setIsChartHovered(true);
-              }}
-              onMouseLeave={() => {
-                if (mod.isCart) setIsCartHovered(false);
-                if (mod.isHeart) setIsHeartHovered(false);
-                if (mod.isChart) setIsChartHovered(false);
-              }}
-            >
-              <div
-                className={`w-11 h-11 rounded-xl ${mod.color} flex items-center justify-center shrink-0`}
-              >
-                {mod.isCart ? (
-                  <ShoppingCartIcon hovered={isCartHovered} className="w-5 h-5" />
-                ) : mod.isHeart ? (
-                  <ScanHeartIcon hovered={isHeartHovered} className="w-5 h-5" />
-                ) : mod.isChart ? (
-                  <ChartLineIcon hovered={isChartHovered} className="w-5 h-5" />
-                ) : (
-                  <mod.icon className="w-5 h-5" />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm">{mod.title}</div>
-                <div className="text-xs text-muted-foreground">{mod.desc}</div>
-              </div>
-              <span className="text-xs text-muted-foreground shrink-0">
-                {mod.tag}
-              </span>
-            </Link>
-          ))}
+          <Link
+            href="#"
+            className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
+          >
+            <div className="w-11 h-11 rounded-xl text-primary bg-primary/8 dark:bg-primary/15 flex items-center justify-center shrink-0">
+              <ShoppingCartIcon className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm">My Orders</div>
+              <div className="text-xs text-muted-foreground">Track your purchases</div>
+            </div>
+            <span className="text-xs text-muted-foreground shrink-0">0 orders</span>
+          </Link>
+
+          <Link
+            href="#"
+            className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
+          >
+            <div className="w-11 h-11 rounded-xl text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15 flex items-center justify-center shrink-0">
+              <ScanHeartIcon className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm">Wishlist</div>
+              <div className="text-xs text-muted-foreground">Saved products</div>
+            </div>
+            <span className="text-xs text-muted-foreground shrink-0">0 saved</span>
+          </Link>
+
+          <Link
+            href="#"
+            className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
+          >
+            <div className="w-11 h-11 rounded-xl text-primary bg-primary/8 dark:bg-primary/15 flex items-center justify-center shrink-0">
+              <Store className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm">Marketplace</div>
+              <div className="text-xs text-muted-foreground">Browse all products</div>
+            </div>
+            <span className="text-xs text-muted-foreground shrink-0">Explore</span>
+          </Link>
+
+          <Link
+            href="#"
+            className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
+          >
+            <div className="w-11 h-11 rounded-xl text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15 flex items-center justify-center shrink-0">
+              <ChartLineIcon className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm">Demand Insights</div>
+              <div className="text-xs text-muted-foreground">Trends & forecasts</div>
+            </div>
+            <span className="text-xs text-muted-foreground shrink-0">Ready</span>
+          </Link>
         </div>
       </div>
 

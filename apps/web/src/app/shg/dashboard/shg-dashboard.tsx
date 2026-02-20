@@ -8,12 +8,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
+import type { Session } from "@/lib/types";
 
 export default function ShgDashboard({
   session,
 }: {
-  session: typeof authClient.$Infer.Session;
+  session: Session;
 }) {
   const firstName = session.user.name.split(" ")[0];
   const hour = new Date().getHours();

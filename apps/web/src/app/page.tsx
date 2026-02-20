@@ -193,18 +193,6 @@ export default function Page() {
         </div>
       </footer>
 
-      <style>{`
-        .marquee-track {
-          animation: marquee 35s linear infinite;
-        }
-        .marquee-track:hover {
-          animation-play-state: paused;
-        }
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(calc(-50%)); }
-        }
-      `}</style>
     </>
   );
 }
