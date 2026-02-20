@@ -48,7 +48,24 @@ const SKILL_OPTIONS = [
   "Block Printing",
 ];
 
-const STEP_LABELS = ["Choose your role", "About you", "Your skills"];
+const INTEREST_OPTIONS = [
+  "Handloom & Textiles",
+  "Pottery & Ceramics",
+  "Embroidered Goods",
+  "Organic Food",
+  "Handmade Jewellery",
+  "Home Decor",
+  "Traditional Art",
+  "Natural Beauty",
+  "Leather Craft",
+  "Eco-Friendly Products",
+];
+
+function getStepLabels(role: string) {
+  if (role === "shg") return ["Choose your role", "About you", "Group details"];
+  if (role === "buyer") return ["Choose your role", "About you", "Your interests"];
+  return ["Choose your role", "About you", "Your skills"];
+}
 
 export default function Onboarding({ userName }: { userName: string }) {
   const router = useRouter();
@@ -60,8 +77,12 @@ export default function Onboarding({ userName }: { userName: string }) {
   const [age, setAge] = useState("");
   const [location, setLocation] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
+  const [interests, setInterests] = useState<string[]>([]);
+  const [shgName, setShgName] = useState("");
+  const [memberCount, setMemberCount] = useState("");
 
   const firstName = (userName || "there").split(" ")[0];
+  const stepLabels = getStepLabels(role);
 
   const ageNum = Number(age);
   const ageError =
@@ -73,19 +94,39 @@ export default function Onboarding({ userName }: { userName: string }) {
   const locationError =
     touched.location && location === "" ? "Location is required" : "";
 
+  const shgNameError =
+    touched.shgName && shgName.trim() === "" ? "Group name is required" : "";
+  const memberCountNum = Number(memberCount);
+  const memberCountError =
+    touched.memberCount && memberCount !== "" && (memberCountNum < 2 || memberCountNum > 500)
+      ? "Enter a number between 2 and 500"
+      : touched.memberCount && memberCount === ""
+        ? "Member count is required"
+        : "";
+
   const canContinue =
     step === 0
       ? role !== ""
       : step === 1
         ? age !== "" && location !== "" && !ageError
-        : true;
+        : step === 2 && role === "shg"
+          ? shgName.trim() !== "" && memberCount !== "" && !memberCountError
+          : true;
 
   async function handleFinish(skipAll = false) {
     setSubmitting(true);
     try {
       const payload = skipAll
         ? { role: "seller" }
-        : { role: role || "seller", age: age ? Number(age) : undefined, location: location || undefined, skills };
+        : {
+            role: role || "seller",
+            age: age ? Number(age) : undefined,
+            location: location || undefined,
+            skills: role === "seller" ? skills : undefined,
+            interests: role === "buyer" ? interests : undefined,
+            shgName: role === "shg" ? shgName : undefined,
+            memberCount: role === "shg" && memberCount ? Number(memberCount) : undefined,
+          };
 
       const res = await fetch("/api/profile", {
         method: "POST",
@@ -109,6 +150,10 @@ export default function Onboarding({ userName }: { userName: string }) {
       setTouched({ age: true, location: true });
       if (!canContinue) return;
     }
+    if (step === 2 && role === "shg") {
+      setTouched((t) => ({ ...t, shgName: true, memberCount: true }));
+      if (!canContinue) return;
+    }
     if (step < 2) {
       setStep(step + 1);
     } else {
@@ -122,7 +167,7 @@ export default function Onboarding({ userName }: { userName: string }) {
         <div
           className="flex items-center justify-center gap-2 mb-10"
           role="group"
-          aria-label={`Step ${step + 1} of 3: ${STEP_LABELS[step]}`}
+          aria-label={`Step ${step + 1} of 3: ${stepLabels[step]}`}
         >
           {[0, 1, 2].map((i) => (
             <div
@@ -138,7 +183,7 @@ export default function Onboarding({ userName }: { userName: string }) {
             />
           ))}
           <span className="sr-only">
-            Step {step + 1} of 3: {STEP_LABELS[step]}
+            Step {step + 1} of 3: {stepLabels[step]}
           </span>
         </div>
 
@@ -252,7 +297,7 @@ export default function Onboarding({ userName }: { userName: string }) {
           </div>
         )}
 
-        {step === 2 && (
+        {step === 2 && role === "seller" && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               What do you make?
@@ -290,6 +335,105 @@ export default function Onboarding({ userName }: { userName: string }) {
             <p className="text-xs text-muted-foreground mt-4">
               This step is optional — skip if none apply.
             </p>
+          </div>
+        )}
+
+        {step === 2 && role === "buyer" && (
+          <div>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
+              What interests you?
+            </h1>
+            <p className="text-muted-foreground mb-8 text-lg">
+              We&apos;ll show you relevant products and artisans.
+            </p>
+
+            <div className="flex flex-wrap gap-2.5" role="group" aria-label="Select your interests">
+              {INTEREST_OPTIONS.map((interest) => {
+                const selected = interests.includes(interest);
+                return (
+                  <button
+                    key={interest}
+                    onClick={() =>
+                      setInterests(
+                        selected
+                          ? interests.filter((i) => i !== interest)
+                          : [...interests, interest],
+                      )
+                    }
+                    aria-pressed={selected}
+                    className={`px-5 py-3 rounded-full text-sm font-medium border-2 transition-all ${
+                      selected
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border/50 hover:border-primary/30 text-foreground"
+                    }`}
+                  >
+                    {interest}
+                  </button>
+                );
+              })}
+            </div>
+
+            <p className="text-xs text-muted-foreground mt-4">
+              This step is optional — skip if none apply.
+            </p>
+          </div>
+        )}
+
+        {step === 2 && role === "shg" && (
+          <div>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
+              About your group
+            </h1>
+            <p className="text-muted-foreground mb-8 text-lg">
+              Tell us about your self-help group.
+            </p>
+
+            <div className="space-y-5">
+              <div className="space-y-2.5">
+                <Label htmlFor="shgName">Group name</Label>
+                <Input
+                  id="shgName"
+                  type="text"
+                  placeholder="e.g. Lakshmi Mahila SHG"
+                  value={shgName}
+                  onChange={(e) => setShgName(e.target.value)}
+                  onBlur={() => setTouched((t) => ({ ...t, shgName: true }))}
+                  aria-required="true"
+                  aria-invalid={shgNameError ? true : undefined}
+                  aria-describedby={shgNameError ? "shgName-error" : undefined}
+                  className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
+                />
+                {shgNameError && (
+                  <p id="shgName-error" role="alert" className="text-sm text-destructive">
+                    {shgNameError}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2.5">
+                <Label htmlFor="memberCount">Number of members</Label>
+                <Input
+                  id="memberCount"
+                  type="number"
+                  inputMode="numeric"
+                  min={2}
+                  max={500}
+                  placeholder="e.g. 15"
+                  value={memberCount}
+                  onChange={(e) => setMemberCount(e.target.value)}
+                  onBlur={() => setTouched((t) => ({ ...t, memberCount: true }))}
+                  aria-required="true"
+                  aria-invalid={memberCountError ? true : undefined}
+                  aria-describedby={memberCountError ? "memberCount-error" : undefined}
+                  className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
+                />
+                {memberCountError && (
+                  <p id="memberCount-error" role="alert" className="text-sm text-destructive">
+                    {memberCountError}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

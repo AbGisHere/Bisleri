@@ -46,6 +46,18 @@ export const auth = betterAuth({
         type: "string",
         required: false,
       },
+      interests: {
+        type: "string",
+        required: false,
+      },
+      shgName: {
+        type: "string",
+        required: false,
+      },
+      memberCount: {
+        type: "number",
+        required: false,
+      },
     },
   },
   plugins: [nextCookies()],
