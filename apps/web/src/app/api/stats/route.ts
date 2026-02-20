@@ -4,6 +4,8 @@ import { product } from "@bisleri/db/schema/products";
 import { order } from "@bisleri/db/schema/orders";
 import { wishlist } from "@bisleri/db/schema/wishlist";
 import { cart } from "@bisleri/db/schema/cart";
+import { workshop, enrollment } from "@bisleri/db/schema/workshops";
+import { program } from "@bisleri/db/schema/programs";
 import { eq, and, count, ne } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -37,6 +39,26 @@ export async function GET() {
       return NextResponse.json({
         products: productsResult?.count ?? 0,
         activeOrders: activeOrdersResult?.count ?? 0,
+      });
+    }
+
+    if (session.user.role === "ngo") {
+      const [[workshopsResult], [programsResult]] = await Promise.all([
+        db.select({ count: count() }).from(workshop).where(eq(workshop.ngoId, session.user.id)),
+        db.select({ count: count() }).from(program).where(eq(program.ngoId, session.user.id)),
+      ]);
+
+      // Count distinct enrolled sellers across all NGO's workshops
+      const enrollees = await db
+        .selectDistinct({ userId: enrollment.userId })
+        .from(enrollment)
+        .innerJoin(workshop, eq(enrollment.workshopId, workshop.id))
+        .where(eq(workshop.ngoId, session.user.id));
+
+      return NextResponse.json({
+        workshops: workshopsResult?.count ?? 0,
+        programs: programsResult?.count ?? 0,
+        enrollees: enrollees.length,
       });
     }
 
