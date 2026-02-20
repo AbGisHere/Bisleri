@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: firstError, issues: fieldErrors }, { status: 400 });
   }
 
-  const { name, description, category, price, quantity, location, demandScale } = parsed.data;
+  const { name, description, category, price, quantity, location, demandScale, imageUrl } = parsed.data;
 
   try {
     const [created] = await db
@@ -104,6 +104,7 @@ export async function POST(request: Request) {
         quantity,
         location,
         demandScale: demandScale ?? null,
+        imageUrl: imageUrl ?? null,
         sellerId: session.user.id,
         status: "active",
       })
