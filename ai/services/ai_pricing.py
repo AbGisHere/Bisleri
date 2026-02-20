@@ -1,8 +1,9 @@
-"""AI pricing service using MiniMax via OpenRouter with tool calling."""
+"""AI pricing service using Kimi K2.5 via OpenRouter with tool calling."""
 
+from collections.abc import AsyncGenerator
 from datetime import datetime
 
-from services.llm_client import chat_with_tools
+from services.llm_client import chat_with_tools, chat_with_tools_stream
 from scrapers.web_search import web_search, fetch_page_content
 from scrapers.marketplace import get_competitor_data
 
@@ -11,14 +12,11 @@ PRICING_TOOLS = [
         "type": "function",
         "function": {
             "name": "web_search",
-            "description": "Search the web for pricing data, market rates, raw material costs, and competitor pricing strategies.",
+            "description": "Search the web for pricing data, market rates, and competitor strategies.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query for pricing research",
-                    },
+                    "query": {"type": "string", "description": "Search query for pricing research"},
                 },
                 "required": ["query"],
             },
@@ -28,14 +26,11 @@ PRICING_TOOLS = [
         "type": "function",
         "function": {
             "name": "fetch_page",
-            "description": "Fetch and read the text content of a webpage URL for detailed pricing or market information.",
+            "description": "Read a webpage for detailed pricing or market data.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "url": {
-                        "type": "string",
-                        "description": "URL to fetch content from",
-                    },
+                    "url": {"type": "string", "description": "URL to fetch"},
                 },
                 "required": ["url"],
             },
@@ -45,14 +40,11 @@ PRICING_TOOLS = [
         "type": "function",
         "function": {
             "name": "get_competitor_prices",
-            "description": "Get competitor product listings and prices from Amazon.in, Flipkart, and IndiaMART.",
+            "description": "Get competitor listings from Amazon.in, Flipkart, IndiaMART.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "product_name": {
-                        "type": "string",
-                        "description": "Product to search for competitor prices",
-                    },
+                    "product_name": {"type": "string", "description": "Product to search"},
                 },
                 "required": ["product_name"],
             },
@@ -66,28 +58,32 @@ PRICING_TOOLS = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "cost_price": {
-                        "type": "number",
-                        "description": "Total cost of production in INR",
-                    },
-                    "selling_price": {
-                        "type": "number",
-                        "description": "Proposed selling price in INR",
-                    },
-                    "platform_fee_percent": {
-                        "type": "number",
-                        "description": "Platform/marketplace fee percentage (default 10)",
-                    },
-                    "shipping_cost": {
-                        "type": "number",
-                        "description": "Shipping cost per unit in INR (default 50)",
-                    },
+                    "cost_price": {"type": "number", "description": "Production cost in INR"},
+                    "selling_price": {"type": "number", "description": "Proposed selling price in INR"},
+                    "platform_fee_percent": {"type": "number", "description": "Platform fee % (default 10)"},
+                    "shipping_cost": {"type": "number", "description": "Shipping cost per unit INR (default 50)"},
                 },
                 "required": ["cost_price", "selling_price"],
             },
         },
     },
 ]
+
+SYSTEM_PROMPT = """You are a pricing strategist for rural Indian products sold by women entrepreneurs on Rangaayan marketplace.
+
+Use the available tools to gather real market data before responding.
+
+Your response MUST begin with this exact line (replace N with your recommended price):
+SUGGESTED_PRICE: ₹N
+
+Then provide a concise analysis:
+- Price range (minimum viable to premium)
+- Competitor price comparison
+- Margin analysis
+- Pricing strategy recommendation
+- Tips to justify the price
+
+Keep it practical. Use plain text, no markdown headers or emojis."""
 
 
 async def _handle_web_search(query: str) -> list[dict]:
@@ -112,7 +108,6 @@ async def _handle_calculate_margin(
     total_cost = cost_price + platform_fee + shipping_cost
     profit = selling_price - total_cost
     margin_percent = (profit / selling_price) * 100 if selling_price > 0 else 0
-
     return {
         "cost_price": cost_price,
         "selling_price": selling_price,
@@ -139,37 +134,14 @@ TOOL_HANDLERS = {
     "calculate_margin": _handle_calculate_margin,
 }
 
-SYSTEM_PROMPT = """You are a pricing strategist for rural Indian products sold by women entrepreneurs on a marketplace called Bisleri.
 
-Your goal is to suggest optimal pricing that:
-1. Undercuts or matches competitor prices while maintaining healthy margins
-2. Accounts for production costs, platform fees, and shipping
-3. Considers the product quality and unique value of handmade/artisan products
-
-Use the available tools to:
-1. Search the web for current market rates and pricing trends
-2. Get competitor prices from Amazon.in, Flipkart, IndiaMART
-3. Calculate margins for different price points
-4. Optionally fetch specific pages for detailed pricing data
-
-Provide your recommendation as:
-- Recommended price (INR)
-- Price range (minimum viable to premium)
-- Competitor price comparison
-- Margin analysis at recommended price
-- Pricing strategy (penetration, value-based, premium artisan, etc.)
-- Tips to justify the price (storytelling, packaging, certification)
-
-Be practical. These are rural women with real costs - don't suggest unsustainably low prices."""
-
-
-async def get_pricing_suggestion(
+def _build_messages(
     product_name: str,
-    cost_price: float | None = None,
-    category: str | None = None,
-    quality: str | None = None,
-    location: str | None = None,
-) -> dict:
+    cost_price: float | None,
+    category: str | None,
+    quality: str | None,
+    location: str | None,
+) -> list[dict]:
     user_msg = f"Suggest optimal pricing for: {product_name}"
     if cost_price:
         user_msg += f"\nProduction cost: ₹{cost_price}"
@@ -179,24 +151,44 @@ async def get_pricing_suggestion(
         user_msg += f"\nQuality: {quality}"
     if location:
         user_msg += f"\nLocation: {location}"
-
-    user_msg += "\n\nSearch for competitor prices, analyze the market, and calculate margins to suggest the best price."
-
-    messages = [
+    user_msg += "\n\nSearch for competitor prices and analyze the market to suggest the best price."
+    return [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": user_msg},
     ]
 
+
+async def get_pricing_suggestion(
+    product_name: str,
+    cost_price: float | None = None,
+    category: str | None = None,
+    quality: str | None = None,
+    location: str | None = None,
+) -> dict:
+    messages = _build_messages(product_name, cost_price, category, quality, location)
     analysis = await chat_with_tools(
         messages=messages,
         tools=PRICING_TOOLS,
         tool_handlers=TOOL_HANDLERS,
     )
-
     return {
         "product": product_name,
-        "cost_price": cost_price,
-        "category": category,
         "analysis": analysis,
         "generated_at": datetime.now().isoformat(),
     }
+
+
+async def get_pricing_suggestion_stream(
+    product_name: str,
+    cost_price: float | None = None,
+    category: str | None = None,
+    quality: str | None = None,
+    location: str | None = None,
+) -> AsyncGenerator[dict, None]:
+    messages = _build_messages(product_name, cost_price, category, quality, location)
+    async for event in chat_with_tools_stream(
+        messages=messages,
+        tools=PRICING_TOOLS,
+        tool_handlers=TOOL_HANDLERS,
+    ):
+        yield event
