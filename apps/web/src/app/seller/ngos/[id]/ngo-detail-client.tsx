@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, MapPin, Calendar, Users, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle2, Users } from "lucide-react";
 import Link from "next/link";
 
 interface Ngo {
@@ -10,8 +10,6 @@ interface Ngo {
   location: string | null;
   focusArea: string | null;
   districtCoverage: string | null;
-  shgName: string | null;
-  memberCount: number | null;
 }
 
 interface Workshop {
@@ -22,7 +20,6 @@ interface Workshop {
   scheduledAt: string;
   location: string;
   maxAttendees: number;
-  status: string;
   enrolledCount: number;
   enrolled: boolean;
 }
@@ -36,22 +33,49 @@ interface Program {
   status: string;
 }
 
-function formatDate(dt: string) {
-  return new Date(dt).toLocaleDateString("en-IN", {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+function parseDate(dt: string) {
+  const d = new Date(dt);
+  return {
+    day: d.getDate(),
+    month: d.toLocaleString("en-IN", { month: "short" }),
+    weekday: d.toLocaleString("en-IN", { weekday: "short" }),
+    time: d.toLocaleString("en-IN", { hour: "2-digit", minute: "2-digit" }),
+  };
 }
 
-const PROGRAM_STATUS_STYLES: Record<string, string> = {
-  active: "bg-forest/10 text-forest dark:bg-forest/20",
-  upcoming: "bg-primary/10 text-primary",
+const STATUS_PILL: Record<string, string> = {
+  active:    "bg-forest/10 text-forest",
+  upcoming:  "bg-primary/10 text-primary",
   completed: "bg-muted text-muted-foreground",
 };
+
+// ── Skeletons ──────────────────────────────────────────────────────────────
+function HeaderSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-3 bg-muted rounded w-20 mb-8" />
+      <div className="h-10 bg-muted rounded w-2/3 mb-3" />
+      <div className="h-3 bg-muted rounded w-1/3 mb-6" />
+      <div className="flex gap-2">
+        <div className="h-5 bg-muted rounded-full w-20" />
+        <div className="h-5 bg-muted rounded-full w-24" />
+      </div>
+    </div>
+  );
+}
+
+function WorkshopSkeleton() {
+  return (
+    <div className="flex gap-0 sm:gap-4 animate-pulse">
+      <div className="w-16 shrink-0 bg-muted/30 border-r border-border/40 py-5" />
+      <div className="flex-1 px-4 py-4 space-y-2">
+        <div className="h-4 bg-muted rounded w-1/2" />
+        <div className="h-3 bg-muted rounded w-1/3" />
+        <div className="h-3 bg-muted rounded w-2/3" />
+      </div>
+    </div>
+  );
+}
 
 export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
   const [ngo, setNgo] = useState<Ngo | null>(null);
@@ -59,31 +83,27 @@ export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState<string | null>(null);
+  const [enrollError, setEnrollError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
       fetch(`/api/ngos?id=${ngoId}`).then((r) => r.json()),
       fetch(`/api/workshops?ngoId=${ngoId}`).then((r) => r.json()),
       fetch(`/api/programs?ngoId=${ngoId}`).then((r) => r.json()),
-    ])
-      .then(([ngoData, workshopsData, programsData]) => {
-        setNgo(ngoData.ngo ?? null);
-        setWorkshops(workshopsData.workshops ?? []);
-        setPrograms(programsData.programs ?? []);
-      })
-      .finally(() => setLoading(false));
+    ]).then(([ngoData, wsData, pgData]) => {
+      setNgo(ngoData.ngo ?? null);
+      setWorkshops(wsData.workshops ?? []);
+      setPrograms(pgData.programs ?? []);
+    }).finally(() => setLoading(false));
   }, [ngoId]);
 
   const handleEnroll = async (workshopId: string, currentlyEnrolled: boolean) => {
+    setEnrollError(null);
     // Optimistic update
     setWorkshops((prev) =>
       prev.map((w) =>
         w.id === workshopId
-          ? {
-              ...w,
-              enrolled: !currentlyEnrolled,
-              enrolledCount: currentlyEnrolled ? w.enrolledCount - 1 : w.enrolledCount + 1,
-            }
+          ? { ...w, enrolled: !currentlyEnrolled, enrolledCount: currentlyEnrolled ? w.enrolledCount - 1 : w.enrolledCount + 1 }
           : w,
       ),
     );
@@ -92,31 +112,22 @@ export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
     try {
       const res = await fetch(`/api/workshops/${workshopId}/enroll`, { method: "POST" });
       const data = await res.json();
-
       if (!res.ok) {
-        // Revert optimistic update
+        // Revert
         setWorkshops((prev) =>
           prev.map((w) =>
             w.id === workshopId
-              ? {
-                  ...w,
-                  enrolled: currentlyEnrolled,
-                  enrolledCount: currentlyEnrolled ? w.enrolledCount + 1 : w.enrolledCount - 1,
-                }
+              ? { ...w, enrolled: currentlyEnrolled, enrolledCount: currentlyEnrolled ? w.enrolledCount + 1 : w.enrolledCount - 1 }
               : w,
           ),
         );
-        alert(data.error ?? "Enrollment failed");
+        setEnrollError(data.error ?? "Could not update enrollment.");
       } else {
-        // Sync with server response
         setWorkshops((prev) =>
-          prev.map((w) =>
-            w.id === workshopId ? { ...w, enrolled: data.enrolled } : w,
-          ),
+          prev.map((w) => (w.id === workshopId ? { ...w, enrolled: data.enrolled } : w)),
         );
       }
     } catch {
-      // Revert on network error
       setWorkshops((prev) =>
         prev.map((w) =>
           w.id === workshopId
@@ -129,19 +140,18 @@ export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
     }
   };
 
+  // ── Loading ────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-4xl mx-auto animate-pulse">
-        <div className="h-4 bg-muted rounded w-32 mb-8" />
-        <div className="h-12 bg-muted rounded w-1/2 mb-4" />
-        <div className="h-3 bg-muted rounded w-1/3 mb-10" />
-        <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-border p-5">
-              <div className="h-4 bg-muted rounded w-1/2 mb-3" />
-              <div className="h-3 bg-muted rounded w-1/3" />
-            </div>
-          ))}
+      <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-20 max-w-2xl mx-auto">
+        <HeaderSkeleton />
+        <div
+          className="mt-10 rounded-2xl backdrop-blur-xl bg-background/40 border border-border/60 overflow-hidden divide-y divide-border/50"
+          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 16px rgba(0,0,0,0.06)' }}
+        >
+          <WorkshopSkeleton />
+          <WorkshopSkeleton />
+          <WorkshopSkeleton />
         </div>
       </div>
     );
@@ -149,134 +159,175 @@ export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
 
   if (!ngo) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-4xl mx-auto">
-        <Link href="/seller/ngos" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
+      <div className="px-4 sm:px-6 lg:px-8 pt-8 max-w-2xl mx-auto">
+        <Link href="/seller/ngos" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" />
-          Back to NGOs
+          Back
         </Link>
-        <p className="text-muted-foreground">NGO not found.</p>
+        <p className="text-muted-foreground text-sm">Organisation not found.</p>
       </div>
     );
   }
 
-  return (
-    <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-4xl mx-auto">
-      {/* Back link */}
-      <Link
-        href="/seller/ngos"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to NGOs
-      </Link>
+  const areas = ngo.focusArea?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
 
-      {/* NGO Header */}
-      <div className="mb-10">
-        <h1 className="font-display text-4xl sm:text-5xl tracking-tight">{ngo.name}</h1>
-        <div className="mt-4 h-[3px] w-10 rounded-full bg-terracotta" />
-        <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
+  return (
+    <div className="pb-20">
+
+      {/* ── NGO hero ──────────────────────────────────────────────────────── */}
+      <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-6 max-w-2xl mx-auto">
+        <Link
+          href="/seller/ngos"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-7"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          All organisations
+        </Link>
+
+        <h1 className="font-display text-4xl sm:text-5xl tracking-tight leading-tight">
+          {ngo.name}
+        </h1>
+        <div className="mt-3 h-[3px] w-8 rounded-full bg-terracotta" />
+
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
           {ngo.location && (
             <span className="flex items-center gap-1.5">
-              <MapPin className="w-4 h-4" />
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
               {ngo.location}
             </span>
           )}
           {ngo.districtCoverage && (
-            <span className="flex items-center gap-1.5">
-              <span className="text-border">·</span>
-              {ngo.districtCoverage}
-            </span>
+            <span className="text-border">·</span>
+          )}
+          {ngo.districtCoverage && (
+            <span>{ngo.districtCoverage}</span>
           )}
         </div>
-        {ngo.focusArea && (
-          <div className="flex flex-wrap gap-2 mt-3">
-            {ngo.focusArea.split(",").map((area) => (
-              <span
-                key={area}
-                className="px-2.5 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent-foreground dark:text-accent"
-              >
-                {area.trim()}
+
+        {areas.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-4">
+            {areas.map((a) => (
+              <span key={a} className="px-2.5 py-1 rounded-full text-xs font-medium bg-terracotta/10 text-terracotta">
+                {a}
               </span>
             ))}
           </div>
         )}
       </div>
 
-      {/* Upcoming Workshops */}
-      <div className="mb-10">
-        <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
+      {/* ── Enroll error ──────────────────────────────────────────────────── */}
+      {enrollError && (
+        <div className="px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto mb-4">
+          <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-4 py-3">
+            {enrollError}
+          </p>
+        </div>
+      )}
+
+      {/* ── Upcoming workshops ────────────────────────────────────────────── */}
+      <div className="px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
+        <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
           Upcoming Workshops
         </h2>
+
         {workshops.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-            <p className="text-muted-foreground text-sm">No upcoming workshops from this NGO.</p>
+          <div className="rounded-2xl border border-dashed border-border/60 py-12 text-center">
+            <p className="text-sm text-muted-foreground">No upcoming workshops from this NGO.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div
+            className="rounded-2xl backdrop-blur-xl bg-background/40 border border-border/60 overflow-hidden divide-y divide-border/50"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 16px rgba(0,0,0,0.06)' }}
+          >
             {workshops.map((w) => {
+              const { day, month, weekday, time } = parseDate(w.scheduledAt);
               const seatsLeft = w.maxAttendees - w.enrolledCount;
               const isFull = seatsLeft <= 0;
               const isEnrolling = enrolling === w.id;
 
               return (
-                <div key={w.id} className="rounded-2xl border border-border p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <h3 className="font-medium text-sm">{w.title}</h3>
-                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent-foreground dark:text-accent">
-                          {w.skillArea}
-                        </span>
+                <div key={w.id} className="flex gap-0 sm:gap-4">
+
+                  {/* ── Date column ── */}
+                  <div className="w-16 shrink-0 flex flex-col items-center justify-center py-5 px-2 bg-terracotta/5 border-r border-border/40">
+                    <span className="font-display text-2xl font-bold text-terracotta leading-none">{day}</span>
+                    <span className="text-[10px] uppercase tracking-widest text-terracotta/70 mt-0.5">{month}</span>
+                    <span className="text-[10px] text-muted-foreground mt-2">{weekday}</span>
+                  </div>
+
+                  {/* ── Workshop info + action ── */}
+                  <div className="flex-1 min-w-0 px-4 py-4 flex flex-col gap-2">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm leading-snug">{w.title}</p>
+                        {w.description && (
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{w.description}</p>
+                        )}
                       </div>
-                      {w.description && (
-                        <p className="text-xs text-muted-foreground mb-2">{w.description}</p>
-                      )}
-                      <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {formatDate(w.scheduledAt)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {w.location}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3 h-3" />
+                      <span className="shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-terracotta/10 text-terracotta">
+                        {w.skillArea}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {w.location}
+                      </span>
+                      <span>·</span>
+                      <span>{time}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3 mt-1">
+                      {/* Seats indicator */}
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-3 h-3 text-muted-foreground" />
+                        <span className={`text-xs font-medium ${isFull ? "text-destructive" : "text-muted-foreground"}`}>
                           {isFull ? "Full" : `${seatsLeft} seat${seatsLeft !== 1 ? "s" : ""} left`}
                         </span>
+                        {!isFull && (
+                          <div className="w-16 h-1 rounded-full bg-muted overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-terracotta"
+                              style={{ width: `${Math.round((w.enrolledCount / w.maxAttendees) * 100)}%` }}
+                            />
+                          </div>
+                        )}
                       </div>
+
+                      {/* Enroll button */}
+                      <button
+                        onClick={() => handleEnroll(w.id, w.enrolled)}
+                        disabled={isEnrolling || (isFull && !w.enrolled)}
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium backdrop-blur-xl border transition-all duration-200 disabled:opacity-50 ${
+                          w.enrolled
+                            ? "bg-forest/15 border-forest/25 text-forest hover:bg-destructive/10 hover:border-destructive/20 hover:text-destructive"
+                            : isFull
+                            ? "bg-muted/60 border-border/50 text-muted-foreground cursor-not-allowed"
+                            : "bg-primary/80 border-white/15 text-primary-foreground hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0"
+                        }`}
+                        style={{
+                          boxShadow: w.enrolled
+                            ? 'inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.08)'
+                            : isFull
+                            ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 1px 3px rgba(0,0,0,0.04)'
+                            : 'inset 0 1px 1px rgba(255,255,255,0.2), 0 3px 10px rgba(0,0,0,0.12)',
+                        }}
+                      >
+                        {isEnrolling ? (
+                          "…"
+                        ) : w.enrolled ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Enrolled
+                          </>
+                        ) : isFull ? (
+                          "Full"
+                        ) : (
+                          "Enroll"
+                        )}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleEnroll(w.id, w.enrolled)}
-                      disabled={isEnrolling || (isFull && !w.enrolled)}
-                      className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium backdrop-blur-xl transition-all duration-200 disabled:opacity-50 ${
-                        w.enrolled
-                          ? "bg-forest/15 border border-forest/25 text-forest dark:bg-forest/20 hover:-translate-y-0.5 hover:bg-destructive/15 hover:border-destructive/25 hover:text-destructive active:translate-y-0"
-                          : isFull
-                          ? "bg-muted/60 border border-border/50 text-muted-foreground cursor-not-allowed"
-                          : "bg-primary/80 border border-white/15 text-primary-foreground hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0"
-                      }`}
-                      style={{
-                        boxShadow: w.enrolled
-                          ? 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.08)'
-                          : isFull
-                          ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.04)'
-                          : 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)',
-                      }}
-                    >
-                      {isEnrolling ? (
-                        <span>…</span>
-                      ) : w.enrolled ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4" />
-                          Enrolled
-                        </>
-                      ) : isFull ? (
-                        "Full"
-                      ) : (
-                        "Enroll"
-                      )}
-                    </button>
                   </div>
                 </div>
               );
@@ -285,46 +336,55 @@ export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
         )}
       </div>
 
-      {/* Programs */}
-      <div>
-        <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
-          Skill Programs
-        </h2>
-        {programs.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-            <p className="text-muted-foreground text-sm">No programs from this NGO.</p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 gap-4">
+      {/* ── Skill programs ────────────────────────────────────────────────── */}
+      {programs.length > 0 && (
+        <div className="px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto mt-10">
+          <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
+            Skill Programs
+          </h2>
+
+          <div
+            className="rounded-2xl backdrop-blur-xl bg-background/40 border border-border/60 overflow-hidden divide-y divide-border/50"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 16px rgba(0,0,0,0.06)' }}
+          >
             {programs.map((p) => (
-              <div key={p.id} className="rounded-2xl border border-border p-5">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="font-medium text-sm">{p.title}</h3>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ${PROGRAM_STATUS_STYLES[p.status] ?? PROGRAM_STATUS_STYLES.active}`}>
+              <div key={p.id} className="px-4 sm:px-5 py-4">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <p className="font-medium text-sm leading-snug">{p.title}</p>
+                  <span className={`shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_PILL[p.status] ?? STATUS_PILL.active}`}>
                     {p.status}
                   </span>
                 </div>
+
                 {p.description && (
-                  <p className="text-xs text-muted-foreground mb-2">{p.description}</p>
+                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{p.description}</p>
                 )}
-                {p.durationWeeks && (
-                  <p className="text-xs text-muted-foreground mb-2">{p.durationWeeks} weeks</p>
-                )}
-                <div className="flex flex-wrap gap-1.5">
-                  {p.skills.split(",").map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground"
-                    >
-                      {skill.trim()}
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {p.durationWeeks && (
+                    <span className="text-xs text-muted-foreground">
+                      {p.durationWeeks} week{p.durationWeeks !== 1 ? "s" : ""}
                     </span>
-                  ))}
+                  )}
+                  {p.durationWeeks && p.skills && (
+                    <span className="text-muted-foreground/40 text-xs">·</span>
+                  )}
+                  <div className="flex flex-wrap gap-1">
+                    {p.skills.split(",").map((s) => (
+                      <span
+                        key={s}
+                        className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-muted text-muted-foreground"
+                      >
+                        {s.trim()}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
