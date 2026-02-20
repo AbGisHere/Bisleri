@@ -2,9 +2,9 @@ import { forwardRef, useImperativeHandle, useCallback } from "react";
 import type { AnimatedIconHandle, AnimatedIconProps } from "./types";
 import { motion, useAnimate } from "motion/react";
 
-const SparklesIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
+const SparklesIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps & { plain?: boolean }>(
   (
-    { size = 24, color = "rgb(250 204 21)", strokeWidth = 2, className = "" },
+    { size = 24, color = "rgb(250 204 21)", strokeWidth = 2, className = "", plain = false },
     ref,
   ) => {
     const [scope, animate] = useAnimate();
@@ -65,7 +65,7 @@ const SparklesIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
         onHoverStart={start}
         onHoverEnd={stop}
         className={`inline-flex cursor-pointer items-center justify-center relative ${className}`}
-        style={{
+        style={plain ? undefined : {
           background: 'rgba(250, 204, 21, 0.15)',
           backdropFilter: 'blur(10px) saturate(180%)',
           border: '1px solid rgba(250, 204, 21, 0.3)',

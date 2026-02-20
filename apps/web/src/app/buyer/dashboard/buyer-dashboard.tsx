@@ -30,6 +30,7 @@ const WORKSPACE_ITEMS: WorkspaceItem[] = [
     desc: "Browse all products",
     tag: "Explore",
     color: "primary",
+    href: "/marketplace",
   },
   {
     icon: ChartLineIcon,
@@ -49,7 +50,7 @@ export default function BuyerDashboard({ session }: { session: Session }) {
         icon: Store,
         title: "Browse Products",
         desc: "Discover products from rural artisans and SHGs",
-        href: "#" as Route,
+        href: "/marketplace" as Route,
       }}
       workspaceItems={WORKSPACE_ITEMS}
       emptyActivityMessage="No activity yet. Browse the marketplace to get started."

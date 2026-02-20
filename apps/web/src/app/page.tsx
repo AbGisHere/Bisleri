@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Users,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
 import ChartLineIcon from "@/components/ui/chart-line-icon";
 import TruckElectricIcon from "@/components/ui/truck-electric-icon";
@@ -178,6 +179,16 @@ export default function Page() {
   const featuresRef = useRef<HTMLDivElement>(null);
   const featuresInView = useInView(featuresRef, { once: true, margin: "-80px" });
 
+  const { data: session } = authClient.useSession();
+  const role = session?.user?.role || "seller";
+  const ctaHref = !session
+    ? "/login"
+    : role === "buyer"
+      ? "/buyer/dashboard"
+      : role === "shg"
+        ? "/shg/dashboard"
+        : "/seller/dashboard";
+
   return (
     <>
       <section className="px-4 sm:px-6 lg:px-8 pt-24 sm:pt-36 pb-20 sm:pb-28 relative overflow-hidden">
@@ -229,10 +240,10 @@ export default function Page() {
             transition={{ duration: 0.5, delay: 0.55 }}
           >
             <Link
-              href="/login"
+              href={ctaHref}
               className="group/btn inline-flex items-center gap-3 mt-8 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-base hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
             >
-              Start selling
+              {session ? "Go to dashboard" : "Start selling"}
               <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
             </Link>
           </motion.div>
@@ -318,10 +329,10 @@ export default function Page() {
           </h2>
           <div className="mt-10">
             <Link
-              href="/login"
+              href={ctaHref}
               className="group/cta inline-flex items-center gap-3 px-10 py-4 rounded-full bg-primary-foreground text-primary dark:bg-primary dark:text-primary-foreground font-bold text-lg hover:shadow-xl hover:shadow-black/10 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
             >
-              Join Rangaayan
+              {session ? "Go to dashboard" : "Join Rangaayan"}
               <ArrowRight className="w-5 h-5 transition-transform group-hover/cta:translate-x-0.5" />
             </Link>
           </div>

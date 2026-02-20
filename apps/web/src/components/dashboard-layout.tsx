@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import Link from "next/link";
 import type { Route } from "next";
 import type { Session } from "@/lib/types";
@@ -18,6 +18,7 @@ export interface WorkspaceItem {
   desc: string;
   tag: string;
   color: "primary" | "accent";
+  href?: Route;
 }
 
 interface DashboardCTA {
@@ -101,7 +102,7 @@ export default function DashboardLayout({
           {workspaceItems.map((mod) => (
             <Link
               key={mod.title}
-              href={"#" as Route}
+              href={(mod.href ?? "#") as Route}
               className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
               onMouseEnter={() => handleMouseEnter(mod.title)}
               onMouseLeave={() => handleMouseLeave(mod.title)}
@@ -165,10 +166,16 @@ export default function DashboardLayout({
         <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
           Recent Activity
         </h2>
-        <div className="rounded-2xl border border-dashed border-border p-12 text-center">
-          <p className="text-muted-foreground text-sm">
-            {emptyActivityMessage}
-          </p>
+        <div className="rounded-2xl border border-border bg-muted/20 px-6 py-14 flex flex-col items-center gap-3 text-center">
+          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+            <Clock className="w-4 h-4 text-muted-foreground/60" />
+          </div>
+          <div>
+            <p className="font-medium text-sm text-foreground">Nothing here yet</p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-xs">
+              {emptyActivityMessage}
+            </p>
+          </div>
         </div>
       </div>
     </div>

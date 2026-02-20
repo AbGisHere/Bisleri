@@ -55,8 +55,8 @@ export default function Header() {
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform">
               <span className="text-primary-foreground font-bold text-sm">R</span>
             </div>
-            <span className="font-display text-xl font-semibold tracking-tight">
-              Rangaayan
+            <span className="font-brand text-xl font-semibold tracking-tight">
+              <span className="text-primary">R</span>angaayan
             </span>
           </Link>
 

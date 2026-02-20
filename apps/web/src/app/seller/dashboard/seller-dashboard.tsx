@@ -17,6 +17,7 @@ const WORKSPACE_ITEMS: WorkspaceItem[] = [
     desc: "Products, orders, payouts",
     tag: "0 listed",
     color: "primary",
+    href: "/marketplace",
   },
   {
     icon: BrainCircuitIcon,
@@ -38,6 +39,7 @@ const WORKSPACE_ITEMS: WorkspaceItem[] = [
     desc: "Shipping & delivery",
     tag: "0 active",
     color: "primary",
+    href: "/seller/logistics",
   },
 ];
 

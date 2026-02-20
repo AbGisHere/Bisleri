@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, DM_Serif_Display, Playfair_Display } from "next/font/google";
 
 import "../index.css";
 import Header from "@/components/header";
@@ -12,6 +12,12 @@ const dmSerif = DM_Serif_Display({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-display",
+});
+
+const playfair = Playfair_Display({
+  weight: ["600", "700"],
+  subsets: ["latin"],
+  variable: "--font-brand",
 });
 
 export const metadata: Metadata = {
@@ -29,7 +35,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${jakarta.variable} ${dmSerif.variable}`}
+      className={`${jakarta.variable} ${dmSerif.variable} ${playfair.variable}`}
     >
       <body className="antialiased">
         <Providers>
@@ -40,8 +46,8 @@ export default function RootLayout({
               <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <span className="font-display text-lg font-semibold text-foreground">
-                      Rangaayan
+                    <span className="font-brand text-lg font-semibold text-foreground">
+                      <span className="text-primary">R</span>angaayan
                     </span>
                     <p className="text-sm text-muted-foreground mt-1">
                       Empowering rural women entrepreneurs across India

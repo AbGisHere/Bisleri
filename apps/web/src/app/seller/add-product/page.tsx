@@ -1,21 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowLeft, TrendingUp, MapPin, Package } from "lucide-react";
+import { useState, useRef } from "react";
+import type { AnimatedIconHandle } from "@/components/ui/types";
+import { ArrowLeft, MapPin, Package } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DemandMeter } from "@/components/ui/demand-meter";
 import SparklesIcon from "@/components/ui/sparkles-icon";
 import { LoadingIcon } from "@/components/ui/loading-icon";
 import CameraIcon from "@/components/ui/camera-icon";
 
 export default function AddProductPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     image: "",
+    imagePreview: "",
     name: "",
     description: "",
     price: "",
@@ -25,6 +27,8 @@ export default function AddProductPage() {
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const descSparkleRef = useRef<AnimatedIconHandle>(null);
+  const priceSparkleRef = useRef<AnimatedIconHandle>(null);
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -37,157 +41,153 @@ export default function AddProductPage() {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // For now, just store the file name
-      // In a real app, you'd upload to cloud storage
       handleInputChange("image", file.name);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData(prev => ({ ...prev, imagePreview: e.target?.result as string }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     console.log("Product data:", formData);
-    // Handle form submission
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/seller/dashboard">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-semibold">Add New Product</h1>
-            <p className="text-muted-foreground">List your product on the marketplace</p>
-          </div>
+    <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-2xl mx-auto">
+      <div className="mb-10">
+        <button
+          onClick={() => router.back()}
+          className="sm:hidden flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </button>
+        <Link
+          href="/seller/dashboard"
+          className="hidden sm:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to dashboard
+        </Link>
+        <h1 className="font-display text-5xl sm:text-6xl tracking-tight">
+          New Listing
+        </h1>
+        <div className="mt-5 h-[3px] w-10 rounded-full bg-terracotta" />
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-12">
+
+        {/* Image */}
+        <div>
+          <input
+            type="file"
+            id="image"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          <label htmlFor="image" className="cursor-pointer block">
+            {formData.imagePreview ? (
+              <div className="relative rounded-2xl overflow-hidden aspect-video bg-muted">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={formData.imagePreview}
+                  alt="Product preview"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
+                  <span className="text-white text-sm font-medium">Change photo</span>
+                </div>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-border hover:border-primary/40 rounded-2xl aspect-video flex flex-col items-center justify-center gap-3 transition-colors bg-muted/20 hover:bg-muted/40">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <CameraIcon className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium">Upload a photo</p>
+                  <p className="text-xs text-muted-foreground mt-1">Click to browse · JPG, PNG, WEBP</p>
+                </div>
+              </div>
+            )}
+          </label>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Product Image */}
-          <Card className="border-terracotta/20 bg-cream/50 dark:bg-clay/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-terracotta dark:text-foreground">
-                <CameraIcon className="h-5 w-5" />
-                Product Image
-              </CardTitle>
-              <CardDescription className="text-muted-foreground font-light">
-                Upload a clear photo of your product
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="border-2 border-dashed border-terracotta/30 rounded-2xl p-8 text-center bg-cream/30 dark:bg-clay/5">
-                  <input
-                    type="file"
-                    id="image"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="image"
-                    className="cursor-pointer flex flex-col items-center gap-2"
-                  >
-                    <CameraIcon className="h-8 w-8 text-terracotta/60 dark:text-saffron/60" />
-                    <span className="text-sm text-muted-foreground font-light">
-                      Click to upload image
-                    </span>
-                  </label>
-                </div>
-                {formData.image && (
-                  <p className="text-sm text-muted-foreground">
-                    Selected: {formData.image}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Product Name */}
-          <Card className="border-terracotta/20 bg-cream/50 dark:bg-clay/10">
-            <CardHeader>
-              <CardTitle className="text-terracotta dark:text-foreground">Product Name</CardTitle>
-              <CardDescription className="text-muted-foreground font-light">
-                Give your product a clear, descriptive name
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+        {/* Details */}
+        <div>
+          <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-6">
+            Details
+          </h2>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">Product name</Label>
               <Input
                 id="name"
                 placeholder="e.g., Handwoven Cotton Basket"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 required
-                className="border-terracotta/20 focus:border-terracotta dark:border-foreground/20 dark:focus:border-foreground"
+                className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Product Description */}
-          <Card className="border-terracotta/20 bg-cream/50 dark:bg-clay/10">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  Product Description
-                </div>
-                <Button
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+                <button
                   type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 border-0 bg-transparent hover:bg-transparent p-0"
                   disabled={isGenerating}
+                  onMouseEnter={() => descSparkleRef.current?.startAnimation()}
+                  onMouseLeave={() => descSparkleRef.current?.stopAnimation()}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
                 >
                   {isGenerating ? (
-                    <LoadingIcon size={16} />
+                    <LoadingIcon size={13} />
                   ) : (
-                    <SparklesIcon size={16} />
+                    <SparklesIcon ref={descSparkleRef} size={13} plain className="text-primary" />
                   )}
-                </Button>
-              </CardTitle>
-              <CardDescription className="text-muted-foreground font-light">
-                Describe your product materials, size, and unique features
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+                  AI generate
+                </button>
+              </div>
               <Textarea
                 id="description"
-                placeholder="Describe your product..."
+                placeholder="Describe your product — materials, size, and what makes it special."
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
                 rows={4}
+                className="rounded-xl px-4 py-3 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50 resize-none"
               />
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        </div>
 
-          {/* Product Price */}
-          <Card className="border-terracotta/20 bg-cream/50 dark:bg-clay/10">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  Product Price
-                </div>
-                <Button
+        {/* Pricing & Stock */}
+        <div>
+          <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-6">
+            Pricing &amp; Stock
+          </h2>
+          <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="price" className="text-sm font-medium">Price</Label>
+                <button
                   type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 border-0 bg-transparent hover:bg-transparent p-0"
                   disabled={isGenerating}
+                  onMouseEnter={() => priceSparkleRef.current?.startAnimation()}
+                  onMouseLeave={() => priceSparkleRef.current?.stopAnimation()}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
                 >
                   {isGenerating ? (
-                    <LoadingIcon size={16} />
+                    <LoadingIcon size={13} />
                   ) : (
-                    <SparklesIcon size={16} />
+                    <SparklesIcon ref={priceSparkleRef} size={13} plain className="text-primary" />
                   )}
-                </Button>
-              </CardTitle>
-              <CardDescription className="text-muted-foreground font-light">
-                Set a competitive price for your product
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+                  Suggest
+                </button>
+              </div>
               <Input
                 id="price"
                 type="text"
@@ -195,41 +195,15 @@ export default function AddProductPage() {
                 value={formData.price}
                 onChange={(e) => handleInputChange("price", e.target.value)}
                 required
-                className="border-terracotta/20 focus:border-terracotta dark:border-foreground/20 dark:focus:border-foreground"
+                className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Product Demand Scale */}
-          <Card className="border-terracotta/20 bg-cream/50 dark:bg-clay/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-terracotta dark:text-foreground">
-                <TrendingUp className="h-5 w-5" />
-                Demand Analysis
-              </CardTitle>
-              <CardDescription className="text-muted-foreground font-light">
-                AI-powered demand prediction based on product details
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DemandMeter
-                productName={formData.name}
-                description={formData.description}
-                price={formData.price}
-                onDemandChange={handleDemandChange}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Product Quantity */}
-          <Card className="border-terracotta/20 bg-cream/50 dark:bg-clay/10">
-            <CardHeader>
-              <CardTitle className="text-terracotta dark:text-foreground">Product Quantity</CardTitle>
-              <CardDescription className="text-muted-foreground font-light">
-                How many units do you have available?
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="quantity" className="text-sm font-medium flex items-center gap-1.5">
+                <Package className="w-3.5 h-3.5 text-muted-foreground" />
+                Quantity
+              </Label>
               <Input
                 id="quantity"
                 type="number"
@@ -238,54 +212,63 @@ export default function AddProductPage() {
                 onChange={(e) => handleInputChange("quantity", e.target.value)}
                 required
                 min="1"
-                className="border-terracotta/20 focus:border-terracotta dark:border-foreground/20 dark:focus:border-foreground"
+                className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        </div>
 
-          {/* Product Location */}
-          <Card className="border-terracotta/20 bg-cream/50 dark:bg-clay/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-terracotta dark:text-foreground">
-                <MapPin className="h-5 w-5" />
-                Product Location
-              </CardTitle>
-              <CardDescription className="text-muted-foreground font-light">
-                Where is this product located?
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+        {/* Location */}
+        <div>
+          <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-6">
+            Location
+          </h2>
+          <div className="space-y-2">
+            <Label htmlFor="location" className="text-sm font-medium">Where is this product?</Label>
+            <div className="relative">
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
               <Input
                 id="location"
-                placeholder="e.g., Jaipur, Rajasthan"
+                placeholder="Village, District, or State"
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
                 required
-                className="border-terracotta/20 focus:border-terracotta dark:border-foreground/20 dark:focus:border-foreground"
+                className="h-12 rounded-xl pl-10 pr-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
-            </CardContent>
-          </Card>
-
-          {/* Submit Button */}
-          <div className="flex gap-4">
-            <Button 
-              type="submit" 
-              className="flex-1 bg-terracotta hover:bg-terracotta/90 text-primary-foreground dark:bg-foreground dark:hover:bg-foreground/90 dark:text-foreground font-medium"
-            >
-              List Product
-            </Button>
-            <Link href="/seller/dashboard">
-              <Button 
-                type="button" 
-                variant="outline"
-                className="border-terracotta/30 text-terracotta hover:bg-terracotta hover:text-primary-foreground dark:border-foreground/30 dark:text-foreground dark:hover:bg-foreground/90 dark:hover:text-foreground"
-              >
-                Cancel
-              </Button>
-            </Link>
+            </div>
           </div>
-        </form>
-      </div>
+        </div>
+
+        {/* Demand */}
+        <div>
+          <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-6">
+            Demand Forecast
+          </h2>
+          <DemandMeter
+            productName={formData.name}
+            description={formData.description}
+            price={formData.price}
+            onDemandChange={handleDemandChange}
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-4 pt-2">
+          <button
+            type="submit"
+            className="flex-1 h-12 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+          >
+            List Product
+          </button>
+          <Link
+            href="/seller/dashboard"
+            className="px-6 h-12 rounded-full border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors flex items-center"
+          >
+            Cancel
+          </Link>
+        </div>
+
+      </form>
     </div>
   );
 }

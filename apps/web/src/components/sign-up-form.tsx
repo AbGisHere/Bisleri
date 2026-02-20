@@ -37,10 +37,7 @@ export default function SignUpForm({
     },
     validators: {
       onSubmit: z.object({
-        name: z
-          .string()
-          .min(2, "Name must be at least 2 characters")
-          .regex(/^[a-zA-Z\s.]+$/, "Name can only contain letters, spaces, and dots"),
+        name: z.string().min(2, "Name must be at least 2 characters"),
         email: z.email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
       }),
@@ -65,7 +62,16 @@ export default function SignUpForm({
         }}
         className="space-y-6"
       >
-        <form.Field name="name">
+        <form.Field
+          name="name"
+          validators={{
+            onBlur: ({ value }) => {
+              if (!value.trim()) return "Name is required";
+              if (value.trim().length < 2) return "Name must be at least 2 characters";
+              return undefined;
+            },
+          }}
+        >
           {(field) => (
             <div className="space-y-2.5">
               <Label htmlFor={field.name}>Full Name</Label>
@@ -74,7 +80,11 @@ export default function SignUpForm({
                 placeholder="Your name"
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(e) => {
+                  // Strip numbers and special characters as the user types
+                  const clean = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+                  field.handleChange(clean);
+                }}
                 className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
               {field.state.meta.errors.map((error) => (
