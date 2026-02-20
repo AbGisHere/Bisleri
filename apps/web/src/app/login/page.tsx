@@ -35,8 +35,8 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 flex flex-col p-12 w-full">
-          <span className="font-display text-xl font-bold">
-            Rangaayan
+          <span className="font-brand text-xl font-bold">
+            <span className="text-primary-foreground">R</span><span className="text-primary-foreground/75">angaayan</span>
           </span>
 
           <div className="mt-auto">

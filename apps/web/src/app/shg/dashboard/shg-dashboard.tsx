@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, UserPlus, BookOpen, Store } from "lucide-react";
+import { Users, CalendarDays, GraduationCap, Store } from "lucide-react";
 import type { Route } from "next";
 import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
@@ -8,18 +8,25 @@ import type { Session } from "@/lib/types";
 
 const WORKSPACE_ITEMS: WorkspaceItem[] = [
   {
-    icon: UserPlus,
-    title: "Members",
-    desc: "Manage group members",
-    tag: "0 members",
+    icon: CalendarDays,
+    title: "Workshop Schedule",
+    desc: "Upcoming & past workshops",
+    tag: "Explore",
+    color: "primary",
+  },
+  {
+    icon: GraduationCap,
+    title: "My Skills",
+    desc: "Skills your group has mastered",
+    tag: "Explore",
     color: "accent",
   },
   {
-    icon: BookOpen,
-    title: "Training Resources",
-    desc: "Courses & learning materials",
+    icon: Users,
+    title: "Women Network",
+    desc: "Connect with other SHG members",
     tag: "Explore",
-    color: "primary",
+    color: "accent",
   },
   {
     icon: Store,
@@ -27,13 +34,6 @@ const WORKSPACE_ITEMS: WorkspaceItem[] = [
     desc: "Group products & orders",
     tag: "0 listed",
     color: "primary",
-  },
-  {
-    icon: Users,
-    title: "SHG Network",
-    desc: "Connect, learn, grow",
-    tag: "Explore",
-    color: "accent",
   },
 ];
 
@@ -43,13 +43,13 @@ export default function ShgDashboard({ session }: { session: Session }) {
       session={session}
       accentColor="bg-forest"
       cta={{
-        icon: Users,
-        title: "Group Network",
-        desc: "Connect with other self-help groups",
+        icon: CalendarDays,
+        title: "Schedule a Workshop",
+        desc: "Plan your next group session",
         href: "#" as Route,
       }}
       workspaceItems={WORKSPACE_ITEMS}
-      emptyActivityMessage="No activity yet. Start by exploring the SHG network."
+      emptyActivityMessage="No activity yet. Start by scheduling a workshop."
     />
   );
 }

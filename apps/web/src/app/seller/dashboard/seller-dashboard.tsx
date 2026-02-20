@@ -1,43 +1,59 @@
 "use client";
 
-import { Store, Truck, Brain, TrendingUp, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
+import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
+import ChartLineIcon from "@/components/ui/chart-line-icon";
+import TruckElectricIcon from "@/components/ui/truck-electric-icon";
+import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
 import type { Route } from "next";
 import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
 import type { Session } from "@/lib/types";
 
-const WORKSPACE_ITEMS: WorkspaceItem[] = [
-  {
-    icon: Store,
-    title: "Marketplace",
-    desc: "Products, orders, payouts",
-    tag: "0 listed",
-    color: "primary",
-  },
-  {
-    icon: Brain,
-    title: "AI Pricing",
-    desc: "Smart price suggestions",
-    tag: "Ready",
-    color: "primary",
-  },
-  {
-    icon: TrendingUp,
-    title: "Demand Insights",
-    desc: "Trends & forecasts",
-    tag: "Ready",
-    color: "accent",
-  },
-  {
-    icon: Truck,
-    title: "Logistics",
-    desc: "Shipping & delivery",
-    tag: "0 active",
-    color: "accent",
-  },
-];
-
 export default function SellerDashboard({ session }: { session: Session }) {
+  const [stats, setStats] = useState<{ products: number; activeOrders: number } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then(setStats)
+      .catch(() => {});
+  }, []);
+
+  const workspaceItems: WorkspaceItem[] = [
+    {
+      icon: ScanBarcodeIcon,
+      title: "Marketplace",
+      desc: "Products, orders, payouts",
+      tag: stats ? `${stats.products} listed` : "…",
+      color: "primary",
+      href: "/marketplace",
+    },
+    {
+      icon: BrainCircuitIcon,
+      title: "AI Pricing",
+      desc: "Smart price suggestions",
+      tag: "Ready",
+      color: "primary",
+    },
+    {
+      icon: ChartLineIcon,
+      title: "Demand Insights",
+      desc: "Trends & forecasts",
+      tag: "Ready",
+      color: "primary",
+    },
+    {
+      icon: TruckElectricIcon,
+      title: "Logistics",
+      desc: "Shipping & delivery",
+      tag: stats ? `${stats.activeOrders} active` : "…",
+      color: "primary",
+      href: "/seller/logistics",
+    },
+  ];
+
   return (
     <DashboardLayout
       session={session}
@@ -46,9 +62,9 @@ export default function SellerDashboard({ session }: { session: Session }) {
         icon: Plus,
         title: "List a new product",
         desc: "Upload a photo and let AI do the rest",
-        href: "#" as Route,
+        href: "/seller/add-product" as Route,
       }}
-      workspaceItems={WORKSPACE_ITEMS}
+      workspaceItems={workspaceItems}
       emptyActivityMessage="No activity yet. List your first product to get started."
     />
   );

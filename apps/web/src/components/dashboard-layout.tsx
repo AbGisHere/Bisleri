@@ -1,11 +1,16 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import Link from "next/link";
 import type { Route } from "next";
 import type { Session } from "@/lib/types";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { useRef } from "react";
+import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
+import ChartLineIcon from "@/components/ui/chart-line-icon";
+import TruckElectricIcon from "@/components/ui/truck-electric-icon";
+import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
 
 export interface WorkspaceItem {
   icon: LucideIcon | ((props: { className?: string }) => ReactNode);
@@ -13,6 +18,7 @@ export interface WorkspaceItem {
   desc: string;
   tag: string;
   color: "primary" | "accent";
+  href?: Route;
 }
 
 interface DashboardCTA {
@@ -41,6 +47,22 @@ export default function DashboardLayout({
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  const iconRefs = useRef<{ [key: string]: any }>({});
+
+  const handleMouseEnter = (title: string) => {
+    const iconRef = iconRefs.current[title];
+    if (iconRef) {
+      iconRef.startAnimation();
+    }
+  };
+
+  const handleMouseLeave = (title: string) => {
+    const iconRef = iconRefs.current[title];
+    if (iconRef) {
+      iconRef.stopAnimation();
+    }
+  };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto">
@@ -80,8 +102,10 @@ export default function DashboardLayout({
           {workspaceItems.map((mod) => (
             <Link
               key={mod.title}
-              href={"#" as Route}
+              href={(mod.href ?? "#") as Route}
               className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
+              onMouseEnter={() => handleMouseEnter(mod.title)}
+              onMouseLeave={() => handleMouseLeave(mod.title)}
             >
               <div
                 className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
@@ -90,7 +114,41 @@ export default function DashboardLayout({
                     : "text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15"
                 }`}
               >
-                <mod.icon className="w-5 h-5" />
+                {mod.icon === BrainCircuitIcon ? (
+                  <BrainCircuitIcon 
+                    ref={(ref) => {
+                      if (ref) iconRefs.current[mod.title] = ref;
+                    }}
+                    size={20} 
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                  />
+                ) : mod.icon === ChartLineIcon ? (
+                  <ChartLineIcon 
+                    ref={(ref) => {
+                      if (ref) iconRefs.current[mod.title] = ref;
+                    }}
+                    size={20} 
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                  />
+                ) : mod.icon === TruckElectricIcon ? (
+                  <TruckElectricIcon 
+                    ref={(ref) => {
+                      if (ref) iconRefs.current[mod.title] = ref;
+                    }}
+                    size={20} 
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                  />
+                ) : mod.icon === ScanBarcodeIcon ? (
+                  <ScanBarcodeIcon 
+                    ref={(ref) => {
+                      if (ref) iconRefs.current[mod.title] = ref;
+                    }}
+                    size={20} 
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                  />
+                ) : (
+                  <mod.icon className="w-5 h-5" />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm">{mod.title}</div>
@@ -108,10 +166,16 @@ export default function DashboardLayout({
         <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
           Recent Activity
         </h2>
-        <div className="rounded-2xl border border-dashed border-border p-12 text-center">
-          <p className="text-muted-foreground text-sm">
-            {emptyActivityMessage}
-          </p>
+        <div className="rounded-2xl border border-border bg-muted/20 px-6 py-14 flex flex-col items-center gap-3 text-center">
+          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+            <Clock className="w-4 h-4 text-muted-foreground/60" />
+          </div>
+          <div>
+            <p className="font-medium text-sm text-foreground">Nothing here yet</p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-xs">
+              {emptyActivityMessage}
+            </p>
+          </div>
         </div>
       </div>
     </div>

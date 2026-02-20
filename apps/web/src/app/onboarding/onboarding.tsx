@@ -6,10 +6,10 @@ import { toast } from "sonner";
 import {
   ShoppingBag,
   Store,
-  Users,
   MapPin,
   ArrowRight,
   Check,
+  Building2,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -28,10 +28,10 @@ const ROLES = [
     icon: Store,
   },
   {
-    value: "shg",
-    label: "SHG Member",
-    desc: "Connect with your self-help group network",
-    icon: Users,
+    value: "ngo",
+    label: "NGO / Non-Profit",
+    desc: "Run workshops and connect women artisans",
+    icon: Building2,
   },
 ];
 
@@ -62,8 +62,8 @@ const INTEREST_OPTIONS = [
 ];
 
 function getStepLabels(role: string) {
-  if (role === "shg") return ["Choose your role", "About you", "Group details"];
   if (role === "buyer") return ["Choose your role", "About you", "Your interests"];
+  if (role === "ngo") return ["Choose your role", "About you", "Your organisation"];
   return ["Choose your role", "About you", "Your skills"];
 }
 
@@ -78,8 +78,10 @@ export default function Onboarding({ userName }: { userName: string }) {
   const [location, setLocation] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
-  const [shgName, setShgName] = useState("");
-  const [memberCount, setMemberCount] = useState("");
+  const [ngoName, setNgoName] = useState("");
+  const [focusArea, setFocusArea] = useState<string[]>([]);
+  const [districtCoverage, setDistrictCoverage] = useState("");
+  const [womenServed, setWomenServed] = useState("");
 
   const firstName = (userName || "there").split(" ")[0];
   const stepLabels = getStepLabels(role);
@@ -94,23 +96,18 @@ export default function Onboarding({ userName }: { userName: string }) {
   const locationError =
     touched.location && location === "" ? "Location is required" : "";
 
-  const shgNameError =
-    touched.shgName && shgName.trim() === "" ? "Group name is required" : "";
-  const memberCountNum = Number(memberCount);
-  const memberCountError =
-    touched.memberCount && memberCount !== "" && (memberCountNum < 2 || memberCountNum > 500)
-      ? "Enter a number between 2 and 500"
-      : touched.memberCount && memberCount === ""
-        ? "Member count is required"
-        : "";
+  const ngoNameError =
+    touched.ngoName && ngoName.trim() === "" ? "Organisation name is required" : "";
+  const focusAreaError =
+    touched.focusArea && focusArea.length === 0 ? "Select at least one focus area" : "";
 
   const canContinue =
     step === 0
       ? role !== ""
       : step === 1
         ? age !== "" && location !== "" && !ageError
-        : step === 2 && role === "shg"
-          ? shgName.trim() !== "" && memberCount !== "" && !memberCountError
+        : step === 2 && role === "ngo"
+          ? ngoName.trim() !== "" && focusArea.length > 0
           : true;
 
   async function handleFinish(skipAll = false) {
@@ -124,8 +121,10 @@ export default function Onboarding({ userName }: { userName: string }) {
             location: location || undefined,
             skills: role === "seller" ? skills : undefined,
             interests: role === "buyer" ? interests : undefined,
-            shgName: role === "shg" ? shgName : undefined,
-            memberCount: role === "shg" && memberCount ? Number(memberCount) : undefined,
+            shgName: role === "ngo" ? ngoName : undefined,
+            memberCount: role === "ngo" && womenServed ? Number(womenServed) : undefined,
+            focusArea: role === "ngo" ? focusArea.join(",") : undefined,
+            districtCoverage: role === "ngo" ? districtCoverage || undefined : undefined,
           };
 
       const res = await fetch("/api/profile", {
@@ -150,8 +149,8 @@ export default function Onboarding({ userName }: { userName: string }) {
       setTouched({ age: true, location: true });
       if (!canContinue) return;
     }
-    if (step === 2 && role === "shg") {
-      setTouched((t) => ({ ...t, shgName: true, memberCount: true }));
+    if (step === 2 && role === "ngo") {
+      setTouched((t) => ({ ...t, ngoName: true, focusArea: true }));
       if (!canContinue) return;
     }
     if (step < 2) {
@@ -205,17 +204,22 @@ export default function Onboarding({ userName }: { userName: string }) {
                     onClick={() => setRole(r.value)}
                     role="radio"
                     aria-checked={role === r.value}
-                    className={`w-full flex items-center gap-4 p-5 rounded-2xl border-2 text-left transition-all ${
+                    style={{
+                      boxShadow: role === r.value
+                        ? 'inset 0 1px 1px rgba(255,255,255,0.25), 0 4px 16px rgba(0,0,0,0.08)'
+                        : 'inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.04)',
+                    }}
+                    className={`w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-all duration-200 backdrop-blur-md ${
                       role === r.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border/50 hover:border-primary/30"
+                        ? "border-primary/50 bg-primary/10"
+                        : "border-white/10 bg-background/40 hover:bg-background/60 hover:border-primary/25"
                     }`}
                   >
                     <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all ${
                         role === r.value
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-white/10 backdrop-blur-sm border border-white/10 text-muted-foreground"
                       }`}
                     >
                       <r.icon className="w-5 h-5" aria-hidden="true" />
@@ -320,10 +324,15 @@ export default function Onboarding({ userName }: { userName: string }) {
                       )
                     }
                     aria-pressed={selected}
-                    className={`px-5 py-3 rounded-full text-sm font-medium border-2 transition-all ${
+                    style={{
+                      boxShadow: selected
+                        ? 'inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.12)'
+                        : 'inset 0 1px 1px rgba(255,255,255,0.15), 0 1px 4px rgba(0,0,0,0.04)',
+                    }}
+                    className={`px-5 py-3 rounded-full text-sm font-medium border transition-all duration-200 backdrop-blur-sm ${
                       selected
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border/50 hover:border-primary/30 text-foreground"
+                        ? "border-primary/60 bg-primary/80 text-primary-foreground"
+                        : "border-white/15 bg-background/30 hover:bg-primary/10 hover:border-primary/30 text-foreground"
                     }`}
                   >
                     {skill}
@@ -361,10 +370,15 @@ export default function Onboarding({ userName }: { userName: string }) {
                       )
                     }
                     aria-pressed={selected}
-                    className={`px-5 py-3 rounded-full text-sm font-medium border-2 transition-all ${
+                    style={{
+                      boxShadow: selected
+                        ? 'inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.12)'
+                        : 'inset 0 1px 1px rgba(255,255,255,0.15), 0 1px 4px rgba(0,0,0,0.04)',
+                    }}
+                    className={`px-5 py-3 rounded-full text-sm font-medium border transition-all duration-200 backdrop-blur-sm ${
                       selected
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border/50 hover:border-primary/30 text-foreground"
+                        ? "border-primary/60 bg-primary/80 text-primary-foreground"
+                        : "border-white/15 bg-background/30 hover:bg-primary/10 hover:border-primary/30 text-foreground"
                     }`}
                   >
                     {interest}
@@ -379,59 +393,106 @@ export default function Onboarding({ userName }: { userName: string }) {
           </div>
         )}
 
-        {step === 2 && role === "shg" && (
+        {step === 2 && role === "ngo" && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
-              About your group
+              Your organisation
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">
-              Tell us about your self-help group.
+              Tell us about your NGO so we can connect you with the right artisans.
             </p>
 
             <div className="space-y-5">
               <div className="space-y-2.5">
-                <Label htmlFor="shgName">Group name</Label>
+                <Label htmlFor="ngoName">Organisation name</Label>
                 <Input
-                  id="shgName"
+                  id="ngoName"
                   type="text"
-                  placeholder="e.g. Lakshmi Mahila SHG"
-                  value={shgName}
-                  onChange={(e) => setShgName(e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, shgName: true }))}
+                  placeholder="e.g. Disha Foundation"
+                  value={ngoName}
+                  onChange={(e) => setNgoName(e.target.value)}
+                  onBlur={() => setTouched((t) => ({ ...t, ngoName: true }))}
                   aria-required="true"
-                  aria-invalid={shgNameError ? true : undefined}
-                  aria-describedby={shgNameError ? "shgName-error" : undefined}
+                  aria-invalid={ngoNameError ? true : undefined}
+                  aria-describedby={ngoNameError ? "ngoName-error" : undefined}
                   className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
                 />
-                {shgNameError && (
-                  <p id="shgName-error" role="alert" className="text-sm text-destructive">
-                    {shgNameError}
+                {ngoNameError && (
+                  <p id="ngoName-error" role="alert" className="text-sm text-destructive">
+                    {ngoNameError}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2.5">
-                <Label htmlFor="memberCount">Number of members</Label>
-                <Input
-                  id="memberCount"
-                  type="number"
-                  inputMode="numeric"
-                  min={2}
-                  max={500}
-                  placeholder="e.g. 15"
-                  value={memberCount}
-                  onChange={(e) => setMemberCount(e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, memberCount: true }))}
-                  aria-required="true"
-                  aria-invalid={memberCountError ? true : undefined}
-                  aria-describedby={memberCountError ? "memberCount-error" : undefined}
-                  className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
-                />
-                {memberCountError && (
-                  <p id="memberCount-error" role="alert" className="text-sm text-destructive">
-                    {memberCountError}
+                <Label>Focus areas</Label>
+                <div
+                  className="flex flex-wrap gap-2.5"
+                  role="group"
+                  aria-label="Select focus areas"
+                  onBlur={() => setTouched((t) => ({ ...t, focusArea: true }))}
+                >
+                  {SKILL_OPTIONS.map((skill) => {
+                    const selected = focusArea.includes(skill);
+                    return (
+                      <button
+                        key={skill}
+                        type="button"
+                        onClick={() =>
+                          setFocusArea(
+                            selected
+                              ? focusArea.filter((s) => s !== skill)
+                              : [...focusArea, skill],
+                          )
+                        }
+                        aria-pressed={selected}
+                        style={{
+                          boxShadow: selected
+                            ? 'inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.12)'
+                            : 'inset 0 1px 1px rgba(255,255,255,0.15), 0 1px 4px rgba(0,0,0,0.04)',
+                        }}
+                        className={`px-5 py-3 rounded-full text-sm font-medium border transition-all duration-200 backdrop-blur-sm ${
+                          selected
+                            ? "border-primary/60 bg-primary/80 text-primary-foreground"
+                            : "border-white/15 bg-background/30 hover:bg-primary/10 hover:border-primary/30 text-foreground"
+                        }`}
+                      >
+                        {skill}
+                      </button>
+                    );
+                  })}
+                </div>
+                {focusAreaError && (
+                  <p role="alert" className="text-sm text-destructive">
+                    {focusAreaError}
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-2.5">
+                <Label htmlFor="districtCoverage">Districts covered <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Input
+                  id="districtCoverage"
+                  type="text"
+                  placeholder="e.g. Pune, Nashik, Aurangabad"
+                  value={districtCoverage}
+                  onChange={(e) => setDistrictCoverage(e.target.value)}
+                  className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
+                />
+              </div>
+
+              <div className="space-y-2.5">
+                <Label htmlFor="womenServed">Women served <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Input
+                  id="womenServed"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  placeholder="e.g. 200"
+                  value={womenServed}
+                  onChange={(e) => setWomenServed(e.target.value)}
+                  className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
+                />
               </div>
             </div>
           </div>
@@ -440,7 +501,8 @@ export default function Onboarding({ userName }: { userName: string }) {
         <button
           onClick={handleNext}
           disabled={!canContinue || submitting}
-          className="mt-10 w-full h-14 rounded-2xl bg-primary text-primary-foreground text-base font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 6px 20px rgba(0,0,0,0.15)' }}
+          className="mt-10 w-full h-14 rounded-2xl backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground text-base font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {submitting
             ? "Saving..."

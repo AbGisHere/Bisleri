@@ -27,6 +27,8 @@ export const user = pgTable("user", {
   interests: text("interests"),
   shgName: text("shg_name"),
   memberCount: integer("member_count"),
+  focusArea: text("focus_area"),
+  districtCoverage: text("district_coverage"),
 });
 
 export const session = pgTable(

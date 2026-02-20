@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingCart } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 import { authClient } from "@/lib/auth-client";
@@ -32,14 +32,26 @@ export default function Header() {
     closeMobileMenu();
   }, [pathname, closeMobileMenu]);
 
+  const [cartCount, setCartCount] = useState(0);
   const role = session?.user?.role || "seller";
+  const isBuyerRoute = pathname.startsWith("/buyer");
+  const showCart = role === "buyer" || isBuyerRoute;
+
+  useEffect(() => {
+    if (!showCart || !session) return;
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d) => setCartCount(d.cart ?? 0))
+      .catch(() => {});
+  }, [showCart, session]);
+
   const dashboardHref =
     !session
       ? "/dashboard"
       : role === "buyer"
         ? "/buyer/dashboard"
-        : role === "shg"
-          ? "/shg/dashboard"
+        : role === "ngo"
+          ? "/ngo/dashboard"
           : "/seller/dashboard";
 
   const links: { to: Route; label: string }[] = [
@@ -55,8 +67,8 @@ export default function Header() {
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform">
               <span className="text-primary-foreground font-bold text-sm">R</span>
             </div>
-            <span className="font-display text-xl font-semibold tracking-tight">
-              Rangaayan
+            <span className="font-brand text-xl font-semibold tracking-tight">
+              <span className="text-primary">R</span>angaayan
             </span>
           </Link>
 
@@ -83,6 +95,21 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
+            {showCart && (
+              <Link
+                href="/buyer/cart"
+                className="relative w-10 h-10 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/30"
+                title="Cart"
+                style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.06)' }}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    {cartCount > 9 ? "9+" : cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
             <ModeToggle />
             <UserMenu />
             <button
@@ -90,7 +117,8 @@ export default function Header() {
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              className="md:hidden w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="md:hidden w-10 h-10 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.06)' }}
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>

@@ -17,8 +17,8 @@ export default async function DashboardPage() {
   const target =
     role === "buyer"
       ? "/buyer/dashboard"
-      : role === "shg"
-        ? "/shg/dashboard"
+      : role === "ngo"
+        ? "/ngo/dashboard"
         : "/seller/dashboard";
   redirect(target);
 }

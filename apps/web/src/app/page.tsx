@@ -3,23 +3,24 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Store,
-  Truck,
   Users,
-  Brain,
-  TrendingUp,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
+import ChartLineIcon from "@/components/ui/chart-line-icon";
+import TruckElectricIcon from "@/components/ui/truck-electric-icon";
+import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 
 const FEATURES = [
   {
-    icon: Store,
+    icon: ScanBarcodeIcon,
     title: "Micromarketplace",
     desc: "Upload a photo, AI writes the description, suggests a price, and shows demand. List in minutes, not hours.",
   },
   {
-    icon: Truck,
+    icon: TruckElectricIcon,
     title: "Logistics",
     desc: "Village-to-doorstep delivery. Track every package, manage returns, handle payouts \u2014 all in one place.",
   },
@@ -29,12 +30,12 @@ const FEATURES = [
     desc: "Find SHGs near you. Apply for training. Get workshop schedules and a one-point contact to your group.",
   },
   {
-    icon: Brain,
+    icon: BrainCircuitIcon,
     title: "AI Pricing",
     desc: "Machine learning analyzes market trends, competitor pricing, and regional demand to suggest optimal prices.",
   },
   {
-    icon: TrendingUp,
+    icon: ChartLineIcon,
     title: "Demand Prediction",
     desc: "Know what\u2019s trending before others. Seasonal forecasts and regional heatmaps for smarter decisions.",
   },
@@ -86,13 +87,26 @@ function FeatureCard({
   desc,
   index,
 }: {
-  icon: typeof Store;
+  icon: typeof Users | typeof BrainCircuitIcon | typeof ChartLineIcon | typeof TruckElectricIcon | typeof ScanBarcodeIcon;
   title: string;
   desc: string;
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const iconRef = useRef<any>(null);
+
+  const handleMouseEnter = () => {
+    if ((Icon === BrainCircuitIcon || Icon === ChartLineIcon || Icon === TruckElectricIcon || Icon === ScanBarcodeIcon) && iconRef.current) {
+      iconRef.current.startAnimation();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if ((Icon === BrainCircuitIcon || Icon === ChartLineIcon || Icon === TruckElectricIcon || Icon === ScanBarcodeIcon) && iconRef.current) {
+      iconRef.current.stopAnimation();
+    }
+  };
 
   return (
     <motion.div
@@ -101,9 +115,21 @@ function FeatureCard({
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
       className="group rounded-2xl border border-border bg-card p-7 transition-shadow hover:shadow-md hover:shadow-primary/5"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5 transition-colors group-hover:bg-primary/15">
-        <Icon className="w-5 h-5 text-primary" />
+        {Icon === BrainCircuitIcon ? (
+          <BrainCircuitIcon ref={iconRef} size={20} className="text-primary" />
+        ) : Icon === ChartLineIcon ? (
+          <ChartLineIcon ref={iconRef} size={20} className="text-primary" />
+        ) : Icon === TruckElectricIcon ? (
+          <TruckElectricIcon ref={iconRef} size={20} className="text-primary" />
+        ) : Icon === ScanBarcodeIcon ? (
+          <ScanBarcodeIcon ref={iconRef} size={20} className="text-primary" />
+        ) : (
+          <Icon className="w-5 h-5 text-primary" />
+        )}
       </div>
       <h3 className="font-display text-lg font-bold mb-2">{title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
@@ -152,6 +178,16 @@ function StepItem({
 export default function Page() {
   const featuresRef = useRef<HTMLDivElement>(null);
   const featuresInView = useInView(featuresRef, { once: true, margin: "-80px" });
+
+  const { data: session } = authClient.useSession();
+  const role = session?.user?.role || "seller";
+  const ctaHref = !session
+    ? "/login"
+    : role === "buyer"
+      ? "/buyer/dashboard"
+      : role === "ngo"
+        ? "/ngo/dashboard"
+        : "/seller/dashboard";
 
   return (
     <>
@@ -204,10 +240,11 @@ export default function Page() {
             transition={{ duration: 0.5, delay: 0.55 }}
           >
             <Link
-              href="/login"
-              className="group/btn inline-flex items-center gap-3 mt-8 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-base hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+              href={ctaHref}
+              className="group/btn inline-flex items-center gap-3 mt-8 px-8 py-3.5 rounded-full backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground font-semibold text-base hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 6px 20px rgba(0,0,0,0.15)' }}
             >
-              Start selling
+              {session ? "Go to dashboard" : "Start selling"}
               <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
             </Link>
           </motion.div>
@@ -293,10 +330,11 @@ export default function Page() {
           </h2>
           <div className="mt-10">
             <Link
-              href="/login"
-              className="group/cta inline-flex items-center gap-3 px-10 py-4 rounded-full bg-primary-foreground text-primary dark:bg-primary dark:text-primary-foreground font-bold text-lg hover:shadow-xl hover:shadow-black/10 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+              href={ctaHref}
+              className="group/cta inline-flex items-center gap-3 px-10 py-4 rounded-full backdrop-blur-xl bg-primary-foreground/80 border border-primary/10 text-primary dark:bg-primary/75 dark:border-white/15 dark:text-primary-foreground font-bold text-lg hover:-translate-y-0.5 hover:bg-primary-foreground/90 dark:hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 8px 24px rgba(0,0,0,0.12)' }}
             >
-              Join Rangaayan
+              {session ? "Go to dashboard" : "Join Rangaayan"}
               <ArrowRight className="w-5 h-5 transition-transform group-hover/cta:translate-x-0.5" />
             </Link>
           </div>
