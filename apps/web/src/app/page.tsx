@@ -11,25 +11,25 @@ import {
 export default function Page() {
   return (
     <>
-      {/* Oversized opening statement — editorial feel */}
-      <section className="px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16">
+      <section className="px-4 sm:px-6 lg:px-8 pt-24 sm:pt-36 pb-20 sm:pb-28">
         <div className="max-w-6xl mx-auto">
-          <p className="text-sm font-medium tracking-widest uppercase text-primary mb-6">
+          <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary/70 mb-8">
             Rural Women&apos;s Marketplace
           </p>
-          <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.05] font-bold tracking-tight max-w-4xl">
+
+          <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.05] font-bold tracking-tight max-w-5xl">
             She makes it.
             <br />
-            <span className="text-primary">The world buys it.</span>
+            <span className="text-primary italic">The world buys it.</span>
           </h1>
-          <p className="mt-8 text-lg text-muted-foreground max-w-lg leading-relaxed">
-            A platform where rural women list products, connect with SHGs, and
-            let AI handle pricing and demand — so they can focus on what they
-            do best.
+
+          <p className="mt-10 sm:mt-14 text-lg sm:text-xl text-muted-foreground max-w-md leading-relaxed">
+            List products, connect with SHGs, and let AI handle pricing
+            and demand — so you can focus on what you do best.
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-3 mt-10 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-3 mt-8 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity"
           >
             Start selling
             <ArrowRight className="w-4 h-4" />
@@ -37,7 +37,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Marquee */}
       <section className="border-y border-border/60 py-5 overflow-hidden">
         <div className="marquee-track flex">
           {[0, 1].map((copy) => (
@@ -65,7 +64,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Asymmetric two-column — big left, stacked right */}
       <section className="px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -125,7 +123,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* How it works — numbered, minimal */}
       <section className="px-4 sm:px-6 lg:px-8 py-24 border-t border-border/60">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-16">
@@ -168,7 +165,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* CTA — full-bleed, typographic */}
       <section className="px-4 sm:px-6 lg:px-8 py-32 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
@@ -188,7 +184,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Footer — minimal */}
       <footer className="px-4 sm:px-6 lg:px-8 py-8 border-t border-border/50">
         <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
           <span className="font-[family-name:var(--font-display)] font-semibold text-foreground">
