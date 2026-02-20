@@ -20,14 +20,16 @@ export default function SellerDashboard({
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto">
-      <div className="pb-10 border-b border-border/50 mb-10">
-        <p className="text-sm text-muted-foreground mb-1">{greeting}</p>
-        <h1 className="font-display text-4xl sm:text-5xl font-bold">
-          {firstName}
+      <div className="mb-12">
+        <p className="text-muted-foreground text-base sm:text-lg font-light">
+          {greeting},
+        </p>
+        <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl tracking-tight mt-0.5 text-foreground">
+          {firstName}.
         </h1>
+        <div className="mt-5 h-[3px] w-10 rounded-full bg-terracotta" />
       </div>
 
       {/* List product CTA */}
