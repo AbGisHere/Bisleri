@@ -50,8 +50,8 @@ export default function Header() {
       ? "/dashboard"
       : role === "buyer"
         ? "/buyer/dashboard"
-        : role === "shg"
-          ? "/shg/dashboard"
+        : role === "ngo"
+          ? "/ngo/dashboard"
           : "/seller/dashboard";
 
   const links: { to: Route; label: string }[] = [

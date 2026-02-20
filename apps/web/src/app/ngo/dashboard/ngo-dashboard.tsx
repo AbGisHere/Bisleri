@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, CalendarDays, GraduationCap, Store } from "lucide-react";
+import { CalendarDays, GraduationCap, Users, BookOpen } from "lucide-react";
 import type { Route } from "next";
 import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
@@ -9,35 +9,35 @@ import type { Session } from "@/lib/types";
 const WORKSPACE_ITEMS: WorkspaceItem[] = [
   {
     icon: CalendarDays,
-    title: "Workshop Schedule",
-    desc: "Upcoming & past workshops",
+    title: "Schedule Workshops",
+    desc: "Plan & manage skill workshops",
     tag: "Explore",
     color: "primary",
   },
   {
     icon: GraduationCap,
-    title: "My Skills",
-    desc: "Skills your group has mastered",
+    title: "Skill Programs",
+    desc: "Create and track skill curricula",
     tag: "Explore",
-    color: "accent",
+    color: "primary",
   },
   {
     icon: Users,
-    title: "Women Network",
-    desc: "Connect with other SHG members",
+    title: "Connect Women",
+    desc: "Network of women in your area",
     tag: "Explore",
     color: "accent",
   },
   {
-    icon: Store,
-    title: "Marketplace",
-    desc: "Group products & orders",
-    tag: "0 listed",
-    color: "primary",
+    icon: BookOpen,
+    title: "Resource Library",
+    desc: "Guides, templates, materials",
+    tag: "Explore",
+    color: "accent",
   },
 ];
 
-export default function ShgDashboard({ session }: { session: Session }) {
+export default function NgoDashboard({ session }: { session: Session }) {
   return (
     <DashboardLayout
       session={session}
@@ -45,7 +45,7 @@ export default function ShgDashboard({ session }: { session: Session }) {
       cta={{
         icon: CalendarDays,
         title: "Schedule a Workshop",
-        desc: "Plan your next group session",
+        desc: "Plan your next skill session",
         href: "#" as Route,
       }}
       workspaceItems={WORKSPACE_ITEMS}

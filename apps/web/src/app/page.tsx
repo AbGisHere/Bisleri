@@ -185,8 +185,8 @@ export default function Page() {
     ? "/login"
     : role === "buyer"
       ? "/buyer/dashboard"
-      : role === "shg"
-        ? "/shg/dashboard"
+      : role === "ngo"
+        ? "/ngo/dashboard"
         : "/seller/dashboard";
 
   return (

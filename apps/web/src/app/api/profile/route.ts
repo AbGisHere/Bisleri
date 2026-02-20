@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { role, age, location, skills, interests, shgName, memberCount } = body;
+  const { role, age, location, skills, interests, shgName, memberCount, focusArea, districtCoverage } = body;
 
   if (role && !ROLES.includes(role as Role)) {
     return NextResponse.json(
@@ -45,6 +45,8 @@ export async function POST(request: Request) {
       interests: Array.isArray(interests) ? interests.join(",") : interests || null,
       shgName: shgName || null,
       memberCount: memberCount ? Number(memberCount) : null,
+      focusArea: focusArea || null,
+      districtCoverage: districtCoverage || null,
       onboardingComplete: true,
     })
     .where(eq(user.id, session.user.id));
