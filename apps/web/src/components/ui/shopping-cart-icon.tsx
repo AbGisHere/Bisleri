@@ -69,6 +69,7 @@ export default function ShoppingCartIcon({
         strokeWidth={strokeWidth}
         strokeMiterlimit="10"
         strokeLinecap="square"
+        aria-hidden="true"
       >
         <motion.path
           className="cart-upper"

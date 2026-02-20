@@ -32,11 +32,11 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="h-10 pl-1.5 pr-4 rounded-full bg-muted/50 hover:bg-muted text-sm font-medium flex items-center gap-2.5 transition-colors cursor-pointer outline-none">
+        <button className="h-10 pl-1.5 pr-4 rounded-full bg-muted/50 hover:bg-muted text-sm font-medium flex items-center gap-2.5 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
           <span className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold">
-            {session.user.name.charAt(0).toUpperCase()}
+            {(session.user.name || "U").charAt(0).toUpperCase()}
           </span>
-          <span className="text-foreground/80">{session.user.name}</span>
+          <span className="text-foreground/80">{session.user.name || "User"}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -46,10 +46,10 @@ export default function UserMenu() {
       >
         <div className="flex items-center gap-3 px-3 py-3">
           <span className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-bold shrink-0">
-            {session.user.name.charAt(0).toUpperCase()}
+            {(session.user.name || "U").charAt(0).toUpperCase()}
           </span>
           <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{session.user.name}</p>
+            <p className="text-sm font-medium truncate">{session.user.name || "User"}</p>
             <p className="text-xs text-muted-foreground truncate">
               {session.user.email}
             </p>

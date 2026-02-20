@@ -11,6 +11,8 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const ROLES = [
   {
@@ -46,20 +48,37 @@ const SKILL_OPTIONS = [
   "Block Printing",
 ];
 
+const STEP_LABELS = ["Choose your role", "About you", "Your skills"];
+
 export default function Onboarding({ userName }: { userName: string }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const [role, setRole] = useState("");
   const [age, setAge] = useState("");
   const [location, setLocation] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
 
-  const firstName = userName.split(" ")[0];
+  const firstName = (userName || "there").split(" ")[0];
+
+  const ageNum = Number(age);
+  const ageError =
+    touched.age && age !== "" && (ageNum < 13 || ageNum > 120)
+      ? "Please enter an age between 13 and 120"
+      : touched.age && age === ""
+        ? "Age is required"
+        : "";
+  const locationError =
+    touched.location && location === "" ? "Location is required" : "";
 
   const canContinue =
-    step === 0 ? role !== "" : step === 1 ? age !== "" && location !== "" : true;
+    step === 0
+      ? role !== ""
+      : step === 1
+        ? age !== "" && location !== "" && !ageError
+        : true;
 
   async function handleFinish() {
     setSubmitting(true);
@@ -82,6 +101,10 @@ export default function Onboarding({ userName }: { userName: string }) {
   }
 
   function handleNext() {
+    if (step === 1) {
+      setTouched({ age: true, location: true });
+      if (!canContinue) return;
+    }
     if (step < 2) {
       setStep(step + 1);
     } else {
@@ -93,10 +116,15 @@ export default function Onboarding({ userName }: { userName: string }) {
     <div className="min-h-[calc(100svh-4rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
         {/* Progress dots */}
-        <div className="flex items-center justify-center gap-2 mb-10">
+        <div
+          className="flex items-center justify-center gap-2 mb-10"
+          role="group"
+          aria-label={`Step ${step + 1} of 3: ${STEP_LABELS[step]}`}
+        >
           {[0, 1, 2].map((i) => (
             <div
               key={i}
+              aria-hidden="true"
               className={`h-2 rounded-full transition-all duration-300 ${
                 i === step
                   ? "w-8 bg-primary"
@@ -106,6 +134,9 @@ export default function Onboarding({ userName }: { userName: string }) {
               }`}
             />
           ))}
+          <span className="sr-only">
+            Step {step + 1} of 3: {STEP_LABELS[step]}
+          </span>
         </div>
 
         {/* Step 0: Role */}
@@ -118,38 +149,43 @@ export default function Onboarding({ userName }: { userName: string }) {
               What brings you here?
             </p>
 
-            <div className="space-y-3">
-              {ROLES.map((r) => (
-                <button
-                  key={r.value}
-                  onClick={() => setRole(r.value)}
-                  className={`w-full flex items-center gap-4 p-5 rounded-2xl border-2 text-left transition-all ${
-                    role === r.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border/50 hover:border-primary/30"
-                  }`}
-                >
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+            <fieldset>
+              <legend className="sr-only">Select your role</legend>
+              <div className="space-y-3" role="radiogroup">
+                {ROLES.map((r) => (
+                  <button
+                    key={r.value}
+                    onClick={() => setRole(r.value)}
+                    role="radio"
+                    aria-checked={role === r.value}
+                    className={`w-full flex items-center gap-4 p-5 rounded-2xl border-2 text-left transition-all ${
                       role === r.value
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
+                        ? "border-primary bg-primary/5"
+                        : "border-border/50 hover:border-primary/30"
                     }`}
                   >
-                    <r.icon className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-semibold">{r.label}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {r.desc}
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                        role === r.value
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <r.icon className="w-5 h-5" aria-hidden="true" />
                     </div>
-                  </div>
-                  {role === r.value && (
-                    <Check className="w-5 h-5 text-primary shrink-0" />
-                  )}
-                </button>
-              ))}
-            </div>
+                    <div className="flex-1">
+                      <div className="font-semibold">{r.label}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {r.desc}
+                      </div>
+                    </div>
+                    {role === r.value && (
+                      <Check className="w-5 h-5 text-primary shrink-0" aria-hidden="true" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
           </div>
         )}
 
@@ -165,13 +201,8 @@ export default function Onboarding({ userName }: { userName: string }) {
 
             <div className="space-y-5">
               <div className="space-y-2.5">
-                <label
-                  htmlFor="age"
-                  className="text-sm font-medium block"
-                >
-                  Your age
-                </label>
-                <input
+                <Label htmlFor="age">Your age</Label>
+                <Input
                   id="age"
                   type="number"
                   inputMode="numeric"
@@ -180,28 +211,41 @@ export default function Onboarding({ userName }: { userName: string }) {
                   placeholder="e.g. 28"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full h-14 rounded-2xl px-5 text-lg bg-muted/40 border-2 border-transparent focus:bg-background focus:border-primary/30 focus:outline-none placeholder:text-muted-foreground/40 transition-colors"
+                  onBlur={() => setTouched((t) => ({ ...t, age: true }))}
+                  aria-required="true"
+                  aria-invalid={ageError ? true : undefined}
+                  aria-describedby={ageError ? "age-error" : undefined}
+                  className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-transparent focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/40"
                 />
+                {ageError && (
+                  <p id="age-error" role="alert" className="text-sm text-destructive">
+                    {ageError}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2.5">
-                <label
-                  htmlFor="location"
-                  className="text-sm font-medium block"
-                >
-                  Where are you from?
-                </label>
+                <Label htmlFor="location">Where are you from?</Label>
                 <div className="relative">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
-                  <input
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" aria-hidden="true" />
+                  <Input
                     id="location"
                     type="text"
                     placeholder="Village, District, or State"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full h-14 rounded-2xl pl-12 pr-5 text-lg bg-muted/40 border-2 border-transparent focus:bg-background focus:border-primary/30 focus:outline-none placeholder:text-muted-foreground/40 transition-colors"
+                    onBlur={() => setTouched((t) => ({ ...t, location: true }))}
+                    aria-required="true"
+                    aria-invalid={locationError ? true : undefined}
+                    aria-describedby={locationError ? "location-error" : undefined}
+                    className="h-14 rounded-2xl pl-12 pr-5 text-lg bg-muted/40 border-transparent focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/40"
                   />
                 </div>
+                {locationError && (
+                  <p id="location-error" role="alert" className="text-sm text-destructive">
+                    {locationError}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -217,7 +261,7 @@ export default function Onboarding({ userName }: { userName: string }) {
               Pick all that apply — you can always change this later.
             </p>
 
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2.5" role="group" aria-label="Select your skills">
               {SKILL_OPTIONS.map((skill) => {
                 const selected = skills.includes(skill);
                 return (
@@ -230,6 +274,7 @@ export default function Onboarding({ userName }: { userName: string }) {
                           : [...skills, skill],
                       )
                     }
+                    aria-pressed={selected}
                     className={`px-5 py-3 rounded-full text-sm font-medium border-2 transition-all ${
                       selected
                         ? "border-primary bg-primary text-primary-foreground"
@@ -252,21 +297,21 @@ export default function Onboarding({ userName }: { userName: string }) {
         <button
           onClick={handleNext}
           disabled={!canContinue || submitting}
-          className="mt-10 w-full h-14 rounded-2xl bg-primary text-primary-foreground text-base font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          className="mt-10 w-full h-14 rounded-2xl bg-primary text-primary-foreground text-base font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {submitting
             ? "Saving..."
             : step === 2
               ? "Get Started"
               : "Continue"}
-          {!submitting && <ArrowRight className="w-4 h-4" />}
+          {!submitting && <ArrowRight className="w-4 h-4" aria-hidden="true" />}
         </button>
 
         {/* Back link */}
         {step > 0 && (
           <button
             onClick={() => setStep(step - 1)}
-            className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg py-1"
           >
             Go back
           </button>

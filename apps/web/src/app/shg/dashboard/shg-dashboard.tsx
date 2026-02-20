@@ -15,7 +15,7 @@ export default function ShgDashboard({
 }: {
   session: Session;
 }) {
-  const firstName = session.user.name.split(" ")[0];
+  const firstName = (session.user.name || "there").split(" ")[0];
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
