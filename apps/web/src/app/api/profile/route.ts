@@ -1,4 +1,4 @@
-import { auth } from "@bisleri/auth";
+import { auth, ROLES, type Role } from "@bisleri/auth";
 import { db } from "@bisleri/db";
 import { user } from "@bisleri/db/schema/auth";
 import { eq } from "drizzle-orm";
@@ -16,6 +16,24 @@ export async function POST(request: Request) {
 
   const body = await request.json();
   const { role, age, location, skills } = body;
+
+  if (role && !ROLES.includes(role as Role)) {
+    return NextResponse.json(
+      { error: `Invalid role. Must be one of: ${ROLES.join(", ")}` },
+      { status: 400 },
+    );
+  }
+
+  if (
+    role &&
+    session.user.onboardingComplete &&
+    role !== session.user.role
+  ) {
+    return NextResponse.json(
+      { error: "Cannot change role after onboarding" },
+      { status: 400 },
+    );
+  }
 
   await db
     .update(user)

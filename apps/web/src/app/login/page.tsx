@@ -16,7 +16,7 @@ export default function LoginPage() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="font-[family-name:var(--font-display)] text-[12rem] font-bold leading-none whitespace-nowrap select-none"
+              className="font-display text-[12rem] font-bold leading-none whitespace-nowrap select-none"
               style={{ transform: `translateX(${i % 2 === 0 ? -40 : 20}px)` }}
             >
               BISLERI
@@ -25,12 +25,12 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
-          <span className="font-[family-name:var(--font-display)] text-xl font-bold">
+          <span className="font-display text-xl font-bold">
             Bisleri
           </span>
 
           <div>
-            <h2 className="font-[family-name:var(--font-display)] text-5xl font-bold leading-[1.1] mb-6">
+            <h2 className="font-display text-5xl font-bold leading-[1.1] mb-6">
               Your craft,
               <br />
               amplified.

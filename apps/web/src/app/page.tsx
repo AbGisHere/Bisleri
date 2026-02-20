@@ -17,7 +17,7 @@ export default function Page() {
             Rural Women&apos;s Marketplace
           </p>
 
-          <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.05] font-bold tracking-tight max-w-5xl">
+          <h1 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.05] font-bold tracking-tight max-w-5xl">
             She makes it.
             <br />
             <span className="text-primary italic">The world buys it.</span>
@@ -67,7 +67,7 @@ export default function Page() {
       <section className="px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold">
               Built around five pillars
             </h2>
             <p className="mt-4 text-muted-foreground max-w-lg mx-auto">
@@ -111,7 +111,7 @@ export default function Page() {
                 } ${i === 4 ? "lg:col-span-1 sm:col-span-2 lg:col-auto" : ""}`}
               >
                 <item.icon className="w-6 h-6 text-primary mb-5" />
-                <h3 className="font-[family-name:var(--font-display)] text-lg font-bold mb-2">
+                <h3 className="font-display text-lg font-bold mb-2">
                   {item.title}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
@@ -126,7 +126,7 @@ export default function Page() {
       <section className="px-4 sm:px-6 lg:px-8 py-24 border-t border-border/60">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-16">
-            <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold">
               Four steps. That&apos;s it.
             </h2>
             <p className="text-muted-foreground max-w-sm">
@@ -154,7 +154,7 @@ export default function Page() {
               },
             ].map((step) => (
               <div key={step.n} className="bg-card p-8">
-                <span className="font-[family-name:var(--font-display)] text-4xl font-bold text-primary/20 block mb-6">
+                <span className="font-display text-4xl font-bold text-primary/20 block mb-6">
                   {step.n}
                 </span>
                 <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
@@ -167,7 +167,7 @@ export default function Page() {
 
       <section className="px-4 sm:px-6 lg:px-8 py-32 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
             Your hands create.
             <br />
             We handle the rest.
@@ -186,7 +186,7 @@ export default function Page() {
 
       <footer className="px-4 sm:px-6 lg:px-8 py-8 border-t border-border/50">
         <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
-          <span className="font-[family-name:var(--font-display)] font-semibold text-foreground">
+          <span className="font-display font-semibold text-foreground">
             Bisleri
           </span>
           <span>Empowering rural women across India</span>

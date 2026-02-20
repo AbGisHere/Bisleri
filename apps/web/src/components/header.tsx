@@ -37,7 +37,7 @@ export default function Header() {
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform">
               <span className="text-primary-foreground font-bold text-sm">B</span>
             </div>
-            <span className="font-[family-name:var(--font-display)] text-xl font-semibold tracking-tight">
+            <span className="font-display text-xl font-semibold tracking-tight">
               Bisleri
             </span>
           </Link>

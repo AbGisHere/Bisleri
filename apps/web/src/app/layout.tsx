@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 
-import { Inter, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google";
 
 import "../index.css";
 import Header from "@/components/header";
 import Providers from "@/components/providers";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
-const playfair = Playfair_Display({
+const dmSerif = DM_Serif_Display({
+  weight: "400",
   subsets: ["latin"],
   variable: "--font-display",
 });
@@ -28,7 +29,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${playfair.variable}`}
+      className={`${jakarta.variable} ${dmSerif.variable}`}
     >
       <body className="antialiased">
         <Providers>
