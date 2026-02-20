@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Store, ShoppingBag } from "lucide-react";
+import { Store, ShoppingBag, Users } from "lucide-react";
 import type { Route } from "next";
 import ShoppingCartIcon from "@/components/ui/shopping-cart-icon";
 import ScanHeartIcon from "@/components/ui/scan-heart-icon";
@@ -59,6 +59,14 @@ export default function BuyerDashboard({ session }: { session: Session }) {
       desc: "Trends & forecasts",
       tag: "Ready",
       color: "accent",
+    },
+    {
+      icon: Users,
+      title: "NGO Connect",
+      desc: "Workshops & skill programs near you",
+      tag: "Explore",
+      color: "primary",
+      href: "/buyer/ngos" as Route,
     },
   ];
 
