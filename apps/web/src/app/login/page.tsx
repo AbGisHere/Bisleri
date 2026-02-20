@@ -9,8 +9,16 @@ export default function LoginPage() {
   const [showSignIn, setShowSignIn] = useState(false);
 
   return (
-    <div className="min-h-[calc(100svh-4rem)] flex">
-      {/* Left — typographic brand panel */}
+    <div className="min-h-[calc(100svh-4rem)] flex flex-col lg:flex-row">
+      <div className="lg:hidden bg-primary text-primary-foreground px-6 py-6 sm:px-12 sm:py-8">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold leading-tight">
+          Your craft, amplified.
+        </h2>
+        <p className="text-primary-foreground/70 text-sm sm:text-base mt-2 max-w-sm">
+          AI pricing. SHG connections. A marketplace that works as hard as you do.
+        </p>
+      </div>
+
       <div className="hidden lg:flex lg:w-2/5 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.04]">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -43,7 +51,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right — form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-sm">
           {showSignIn ? (

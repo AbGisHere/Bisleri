@@ -148,9 +148,7 @@ export default function Page() {
 
   return (
     <>
-      {/* Hero */}
       <section className="px-4 sm:px-6 lg:px-8 pt-24 sm:pt-36 pb-20 sm:pb-28 relative overflow-hidden">
-        {/* Decorative grain texture */}
         <div
           className="absolute inset-0 opacity-[0.03] dark:opacity-[0.04] pointer-events-none"
           style={{
@@ -160,7 +158,6 @@ export default function Page() {
           }}
         />
 
-        {/* Decorative woven thread */}
         <WovenThread className="absolute top-16 right-0 w-64 sm:w-96 text-primary hidden sm:block" />
 
         <div className="max-w-6xl mx-auto relative">
@@ -210,7 +207,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Marquee */}
       <section className="border-y border-border/60 py-5 overflow-hidden">
         <div className="marquee-track flex">
           {[0, 1].map((copy) => (
@@ -238,7 +234,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Five Pillars */}
       <section className="px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16" ref={featuresRef}>
@@ -269,7 +264,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Steps */}
       <section className="px-4 sm:px-6 lg:px-8 py-24 border-t border-border/60">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-16">
@@ -289,9 +283,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="px-4 sm:px-6 lg:px-8 py-32 bg-primary text-primary-foreground dark:bg-card dark:text-foreground dark:border-y dark:border-border relative overflow-hidden">
-        {/* Decorative shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
           <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-primary-foreground/[0.04] dark:bg-primary/[0.06]" />
           <div className="absolute -bottom-32 -right-16 w-80 h-80 rounded-full bg-primary-foreground/[0.03] dark:bg-primary/[0.04]" />

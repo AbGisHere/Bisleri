@@ -80,18 +80,22 @@ export default function Onboarding({ userName }: { userName: string }) {
         ? age !== "" && location !== "" && !ageError
         : true;
 
-  async function handleFinish() {
+  async function handleFinish(skipAll = false) {
     setSubmitting(true);
     try {
+      const payload = skipAll
+        ? { role: "seller" }
+        : { role: role || "seller", age: age ? Number(age) : undefined, location: location || undefined, skills };
+
       const res = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, age: Number(age), location, skills }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Failed to save profile");
 
-      toast.success("You're all set!");
+      toast.success(skipAll ? "Welcome! You can update your profile anytime." : "You\u2019re all set!");
       router.push("/dashboard");
     } catch {
       toast.error("Something went wrong. Please try again.");
@@ -115,7 +119,6 @@ export default function Onboarding({ userName }: { userName: string }) {
   return (
     <div className="min-h-[calc(100svh-4rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
-        {/* Progress dots */}
         <div
           className="flex items-center justify-center gap-2 mb-10"
           role="group"
@@ -139,7 +142,6 @@ export default function Onboarding({ userName }: { userName: string }) {
           </span>
         </div>
 
-        {/* Step 0: Role */}
         {step === 0 && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
@@ -189,7 +191,6 @@ export default function Onboarding({ userName }: { userName: string }) {
           </div>
         )}
 
-        {/* Step 1: About — age + location */}
         {step === 1 && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
@@ -251,7 +252,6 @@ export default function Onboarding({ userName }: { userName: string }) {
           </div>
         )}
 
-        {/* Step 2: Skills */}
         {step === 2 && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
@@ -293,7 +293,6 @@ export default function Onboarding({ userName }: { userName: string }) {
           </div>
         )}
 
-        {/* Continue button */}
         <button
           onClick={handleNext}
           disabled={!canContinue || submitting}
@@ -307,7 +306,6 @@ export default function Onboarding({ userName }: { userName: string }) {
           {!submitting && <ArrowRight className="w-4 h-4" aria-hidden="true" />}
         </button>
 
-        {/* Back link */}
         {step > 0 && (
           <button
             onClick={() => setStep(step - 1)}
@@ -316,6 +314,14 @@ export default function Onboarding({ userName }: { userName: string }) {
             Go back
           </button>
         )}
+
+        <button
+          onClick={() => handleFinish(true)}
+          disabled={submitting}
+          className="mt-3 w-full text-center text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors py-1 disabled:opacity-40"
+        >
+          Skip for now — I&apos;ll explore on my own
+        </button>
       </div>
     </div>
   );
