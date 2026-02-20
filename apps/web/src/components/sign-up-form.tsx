@@ -48,7 +48,7 @@ export default function SignUpForm({
 
   return (
     <div>
-      <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold mb-2">
+      <h1 className="font-display text-3xl font-bold mb-2">
         Create your account
       </h1>
       <p className="text-muted-foreground mb-10">

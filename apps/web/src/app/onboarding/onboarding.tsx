@@ -111,7 +111,7 @@ export default function Onboarding({ userName }: { userName: string }) {
         {/* Step 0: Role */}
         {step === 0 && (
           <div>
-            <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold mb-2">
+            <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               Welcome, {firstName}!
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">
@@ -156,7 +156,7 @@ export default function Onboarding({ userName }: { userName: string }) {
         {/* Step 1: About — age + location */}
         {step === 1 && (
           <div>
-            <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold mb-2">
+            <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               Tell us about you
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">
@@ -210,7 +210,7 @@ export default function Onboarding({ userName }: { userName: string }) {
         {/* Step 2: Skills */}
         {step === 2 && (
           <div>
-            <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold mb-2">
+            <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               What do you make?
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">

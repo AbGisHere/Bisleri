@@ -24,7 +24,7 @@ export default function BuyerDashboard({
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto">
       <div className="pb-10 border-b border-border/50 mb-10">
         <p className="text-sm text-muted-foreground mb-1">{greeting}</p>
-        <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-bold">
+        <h1 className="font-display text-4xl sm:text-5xl font-bold">
           {firstName}
         </h1>
       </div>
