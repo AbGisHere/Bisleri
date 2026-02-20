@@ -1,6 +1,9 @@
 "use client";
 
-import { Store, Truck, Brain, TrendingUp, Plus } from "lucide-react";
+import { Store, Plus } from "lucide-react";
+import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
+import ChartLineIcon from "@/components/ui/chart-line-icon";
+import TruckElectricIcon from "@/components/ui/truck-electric-icon";
 import type { Route } from "next";
 import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
@@ -15,25 +18,25 @@ const WORKSPACE_ITEMS: WorkspaceItem[] = [
     color: "primary",
   },
   {
-    icon: Brain,
+    icon: BrainCircuitIcon,
     title: "AI Pricing",
     desc: "Smart price suggestions",
     tag: "Ready",
     color: "primary",
   },
   {
-    icon: TrendingUp,
+    icon: ChartLineIcon,
     title: "Demand Insights",
     desc: "Trends & forecasts",
     tag: "Ready",
-    color: "accent",
+    color: "primary",
   },
   {
-    icon: Truck,
+    icon: TruckElectricIcon,
     title: "Logistics",
     desc: "Shipping & delivery",
     tag: "0 active",
-    color: "accent",
+    color: "primary",
   },
 ];
 

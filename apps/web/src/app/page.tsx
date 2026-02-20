@@ -4,11 +4,11 @@ import Link from "next/link";
 import {
   ArrowRight,
   Store,
-  Truck,
   Users,
-  Brain,
-  TrendingUp,
 } from "lucide-react";
+import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
+import ChartLineIcon from "@/components/ui/chart-line-icon";
+import TruckElectricIcon from "@/components/ui/truck-electric-icon";
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 
@@ -19,7 +19,7 @@ const FEATURES = [
     desc: "Upload a photo, AI writes the description, suggests a price, and shows demand. List in minutes, not hours.",
   },
   {
-    icon: Truck,
+    icon: TruckElectricIcon,
     title: "Logistics",
     desc: "Village-to-doorstep delivery. Track every package, manage returns, handle payouts \u2014 all in one place.",
   },
@@ -29,12 +29,12 @@ const FEATURES = [
     desc: "Find SHGs near you. Apply for training. Get workshop schedules and a one-point contact to your group.",
   },
   {
-    icon: Brain,
+    icon: BrainCircuitIcon,
     title: "AI Pricing",
     desc: "Machine learning analyzes market trends, competitor pricing, and regional demand to suggest optimal prices.",
   },
   {
-    icon: TrendingUp,
+    icon: ChartLineIcon,
     title: "Demand Prediction",
     desc: "Know what\u2019s trending before others. Seasonal forecasts and regional heatmaps for smarter decisions.",
   },
@@ -86,13 +86,26 @@ function FeatureCard({
   desc,
   index,
 }: {
-  icon: typeof Store;
+  icon: typeof Store | typeof BrainCircuitIcon | typeof ChartLineIcon | typeof TruckElectricIcon;
   title: string;
   desc: string;
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const iconRef = useRef<any>(null);
+
+  const handleMouseEnter = () => {
+    if ((Icon === BrainCircuitIcon || Icon === ChartLineIcon || Icon === TruckElectricIcon) && iconRef.current) {
+      iconRef.current.startAnimation();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if ((Icon === BrainCircuitIcon || Icon === ChartLineIcon || Icon === TruckElectricIcon) && iconRef.current) {
+      iconRef.current.stopAnimation();
+    }
+  };
 
   return (
     <motion.div
@@ -101,9 +114,19 @@ function FeatureCard({
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
       className="group rounded-2xl border border-border bg-card p-7 transition-shadow hover:shadow-md hover:shadow-primary/5"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5 transition-colors group-hover:bg-primary/15">
-        <Icon className="w-5 h-5 text-primary" />
+        {Icon === BrainCircuitIcon ? (
+          <BrainCircuitIcon ref={iconRef} size={20} className="text-primary" />
+        ) : Icon === ChartLineIcon ? (
+          <ChartLineIcon ref={iconRef} size={20} className="text-primary" />
+        ) : Icon === TruckElectricIcon ? (
+          <TruckElectricIcon ref={iconRef} size={20} className="text-primary" />
+        ) : (
+          <Icon className="w-5 h-5 text-primary" />
+        )}
       </div>
       <h3 className="font-display text-lg font-bold mb-2">{title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
