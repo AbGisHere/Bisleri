@@ -36,6 +36,7 @@ export default function SellerDashboard({ session }: { session: Session }) {
       desc: "Smart price suggestions",
       tag: "Ready",
       color: "primary",
+      href: "/seller/ai-pricing",
     },
     {
       icon: ChartLineIcon,
@@ -43,6 +44,7 @@ export default function SellerDashboard({ session }: { session: Session }) {
       desc: "Trends & forecasts",
       tag: "Ready",
       color: "primary",
+      href: "/seller/demand-insights",
     },
     {
       icon: TruckElectricIcon,

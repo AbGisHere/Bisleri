@@ -1,120 +1,73 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import { TrendingUp } from "lucide-react";
 import { LoadingIcon } from "./loading-icon";
+import { toast } from "sonner";
+import { useAiStream } from "@/lib/use-ai-stream";
+import {
+  cleanAiLines,
+  extractDemandScore,
+  getDemandColor,
+  getDemandLabel,
+  getMeterColor,
+} from "@/lib/parse-ai";
 
 interface DemandMeterProps {
   productName?: string;
-  description?: string;
-  price?: string;
   onDemandChange?: (demandScore: number) => void;
 }
 
-export function DemandMeter({ 
-  productName, 
-  description, 
-  price, 
-  onDemandChange 
-}: DemandMeterProps) {
-  const [demandScore, setDemandScore] = useState<number>(0);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+export function DemandMeter({ productName, onDemandChange }: DemandMeterProps) {
+  const [demandScore, setDemandScore] = useState(0);
+  const [insightLines, setInsightLines] = useState<string[]>([]);
+  const stream = useAiStream("/api/ai/demand");
 
-  // Simulate AI demand analysis based on product details
-  const analyzeDemand = async () => {
-    if (!productName || !description || !price) {
-      setDemandScore(0);
-      onDemandChange?.(0);
+  const analyzeDemand = useCallback(async () => {
+    if (!productName) {
+      toast.error("Enter a product name first");
       return;
     }
 
-    setIsAnalyzing(true);
-    
-    // Simulate AI processing delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Simple algorithm to simulate demand analysis
-    // In real implementation, this would call your AI service
-    let score = 50; // Base score
-    
-    // Price factor (lower price = higher demand for rural products)
-    const priceNum = parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
-    if (priceNum < 100) score += 20;
-    else if (priceNum < 500) score += 10;
-    else if (priceNum > 1000) score -= 15;
-    
-    // Description length factor (detailed descriptions suggest quality)
-    if (description.length > 100) score += 10;
-    else if (description.length < 20) score -= 10;
-    
-    // Keywords that suggest high demand
-    const highDemandKeywords = ['handmade', 'organic', 'natural', 'traditional', 'authentic', 'local'];
-    const foundKeywords = highDemandKeywords.filter(keyword => 
-      description.toLowerCase().includes(keyword) || 
-      productName.toLowerCase().includes(keyword)
-    );
-    score += foundKeywords.length * 8;
-    
-    // Ensure score is within 0-100 range
-    score = Math.max(0, Math.min(100, score));
-    
-    // Add some randomness to simulate AI variance
-    score = Math.round(score + (Math.random() * 10 - 5));
-    score = Math.max(0, Math.min(100, score));
-    
-    setDemandScore(score);
-    onDemandChange?.(score);
-    setIsAnalyzing(false);
-  };
+    const result = await stream.run({
+      product_name: productName,
+      location: "India",
+    });
 
-  useEffect(() => {
-    analyzeDemand();
-  }, [productName, description, price]);
-
-  const getDemandColor = (score: number) => {
-    if (score >= 70) return "text-forest dark:text-forest-light";
-    if (score >= 40) return "text-foreground";
-    return "text-terracotta dark:text-terracotta-light";
-  };
-
-  const getDemandLabel = (score: number) => {
-    if (score >= 70) return "High Demand";
-    if (score >= 40) return "Medium Demand";
-    return "Low Demand";
-  };
-
-  const getMeterColor = (score: number) => {
-    if (score >= 70) return "bg-forest";
-    if (score >= 40) return "bg-muted";
-    return "bg-terracotta";
-  };
+    if (result) {
+      const score = extractDemandScore(result);
+      setDemandScore(score);
+      setInsightLines(cleanAiLines(result).slice(0, 6));
+      onDemandChange?.(score);
+    }
+  }, [productName, stream, onDemandChange]);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
           <span className="text-sm font-medium">Demand Analysis</span>
         </div>
-        {isAnalyzing && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <LoadingIcon size={12} className="text-terracotta dark:text-foreground" />
-            Analyzing...
-          </div>
-        )}
+        <button
+          type="button"
+          onClick={analyzeDemand}
+          disabled={stream.isLoading}
+          className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
+        >
+          {stream.isLoading && <LoadingIcon size={12} className="text-terracotta dark:text-foreground" />}
+          {stream.isLoading ? stream.status || "Analyzing..." : demandScore > 0 ? "Re-analyze" : "Analyze"}
+        </button>
       </div>
-      
-      {/* Demand Meter */}
+
       <div className="relative">
-        <div className="h-2 bg-cream dark:bg-clay rounded-full overflow-hidden">
-          <div 
-            className={`h-full transition-all duration-500 ease-out ${getMeterColor(demandScore)}`}
+        <div className="h-2.5 bg-cream dark:bg-clay rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-700 ease-out ${getMeterColor(demandScore)}`}
             style={{ width: `${demandScore}%` }}
           />
         </div>
-        
-        {/* Scale markers */}
-        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+        <div className="flex justify-between text-[10px] text-muted-foreground/60 mt-1.5 px-0.5">
           <span>0</span>
           <span>25</span>
           <span>50</span>
@@ -122,34 +75,23 @@ export function DemandMeter({
           <span>100</span>
         </div>
       </div>
-      
-      {/* Demand Score and Label */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className={`text-2xl font-bold ${getDemandColor(demandScore)}`}>
+
+      {demandScore > 0 && !stream.isLoading && (
+        <div className="flex items-baseline gap-2">
+          <span className={`text-3xl font-bold tabular-nums ${getDemandColor(demandScore)}`}>
             {demandScore}
           </span>
           <span className={`text-sm font-medium ${getDemandColor(demandScore)}`}>
             {getDemandLabel(demandScore)}
           </span>
         </div>
-        
-        {!isAnalyzing && (productName || description || price) && (
-          <button
-            onClick={analyzeDemand}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Refresh
-          </button>
-        )}
-      </div>
-      
-      {/* Insight Message */}
-      {!isAnalyzing && demandScore > 0 && (
-        <div className="text-xs text-muted-foreground">
-          {demandScore >= 70 && "This product shows strong market potential based on current trends."}
-          {demandScore >= 40 && demandScore < 70 && "This product has moderate market demand."}
-          {demandScore < 40 && "Consider adjusting price or description to improve demand."}
+      )}
+
+      {insightLines.length > 0 && !stream.isLoading && (
+        <div className="space-y-1.5 pt-1">
+          {insightLines.map((line, i) => (
+            <p key={i} className="text-xs text-muted-foreground leading-relaxed">{line}</p>
+          ))}
         </div>
       )}
     </div>

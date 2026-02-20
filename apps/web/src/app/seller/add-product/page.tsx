@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import type { AnimatedIconHandle } from "@/components/ui/types";
-import { ArrowLeft, MapPin, Package } from "lucide-react";
+import { MapPin, Package } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -10,11 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DemandMeter } from "@/components/ui/demand-meter";
+import { CategoryPicker } from "@/components/ui/category-picker";
+import { PageHeader } from "@/components/ui/page-header";
 import SparklesIcon from "@/components/ui/sparkles-icon";
 import { LoadingIcon } from "@/components/ui/loading-icon";
 import CameraIcon from "@/components/ui/camera-icon";
-
-const CATEGORIES = ["Weaving", "Pottery", "Embroidery", "Food", "Jewellery", "Painting", "Basket Weaving", "Tailoring"];
+import { useAiStream } from "@/lib/use-ai-stream";
+import { extractPrice } from "@/lib/parse-ai";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -31,11 +33,63 @@ export default function AddProductPage() {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const priceStream = useAiStream("/api/ai/pricing");
   const descSparkleRef = useRef<AnimatedIconHandle>(null);
   const priceSparkleRef = useRef<AnimatedIconHandle>(null);
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!formData.name) {
+      toast.error("Enter a product name first");
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/ai/describe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_name: formData.name,
+          category: formData.category || undefined,
+        }),
+      });
+      if (!res.ok) throw new Error("AI service unavailable");
+      const data = await res.json();
+      setFormData(prev => ({
+        ...prev,
+        description: data.description,
+        ...(data.suggested_category && !prev.category ? { category: data.suggested_category } : {}),
+      }));
+      toast.success("Description generated");
+    } catch {
+      toast.error("Could not generate description. Is the AI server running?");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSuggestPrice = async () => {
+    if (!formData.name) {
+      toast.error("Enter a product name first");
+      return;
+    }
+    const result = await priceStream.run({
+      product_name: formData.name,
+      category: formData.category || undefined,
+      location: formData.location || undefined,
+    });
+    if (result) {
+      const price = extractPrice(result);
+      if (price) {
+        setFormData(prev => ({ ...prev, price }));
+        toast.success("Price suggested based on market analysis");
+      } else {
+        toast.info("AI analyzed the market but couldn't extract a specific price.");
+      }
+    }
   };
 
   const handleDemandChange = (demandScore: number) => {
@@ -90,26 +144,7 @@ export default function AddProductPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-2xl mx-auto">
-      <div className="mb-10">
-        <button
-          onClick={() => router.back()}
-          className="sm:hidden flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </button>
-        <Link
-          href="/seller/dashboard"
-          className="hidden sm:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to dashboard
-        </Link>
-        <h1 className="font-display text-5xl sm:text-6xl tracking-tight">
-          New Listing
-        </h1>
-        <div className="mt-5 h-[3px] w-10 rounded-full bg-terracotta" />
-      </div>
+      <PageHeader title="New Listing" />
 
       <form onSubmit={handleSubmit} noValidate className="space-y-12">
 
@@ -173,6 +208,7 @@ export default function AddProductPage() {
                 <button
                   type="button"
                   disabled={isGenerating}
+                  onClick={handleGenerateDescription}
                   onMouseEnter={() => descSparkleRef.current?.startAnimation()}
                   onMouseLeave={() => descSparkleRef.current?.stopAnimation()}
                   className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
@@ -182,7 +218,7 @@ export default function AddProductPage() {
                   ) : (
                     <SparklesIcon ref={descSparkleRef} size={13} plain className="text-primary" />
                   )}
-                  AI generate
+                  {isGenerating ? "Generating…" : "AI generate"}
                 </button>
               </div>
               <Textarea
@@ -197,23 +233,10 @@ export default function AddProductPage() {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Category</Label>
-              <div className="flex flex-wrap gap-2">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => handleInputChange("category", formData.category === cat ? "" : cat)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium border backdrop-blur-xl transition-all duration-200 ${
-                      formData.category === cat
-                        ? "border-primary/40 bg-primary/10 text-primary"
-                        : "border-primary/15 bg-primary/5 text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-foreground"
-                    }`}
-                    style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4)' }}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              <CategoryPicker
+                value={formData.category}
+                onChange={(cat) => handleInputChange("category", cat)}
+              />
             </div>
           </div>
         </div>
@@ -229,17 +252,18 @@ export default function AddProductPage() {
                 <Label htmlFor="price" className="text-sm font-medium">Price</Label>
                 <button
                   type="button"
-                  disabled={isGenerating}
+                  disabled={priceStream.isLoading}
+                  onClick={handleSuggestPrice}
                   onMouseEnter={() => priceSparkleRef.current?.startAnimation()}
                   onMouseLeave={() => priceSparkleRef.current?.stopAnimation()}
                   className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
                 >
-                  {isGenerating ? (
+                  {priceStream.isLoading ? (
                     <LoadingIcon size={13} />
                   ) : (
                     <SparklesIcon ref={priceSparkleRef} size={13} plain className="text-primary" />
                   )}
-                  Suggest
+                  {priceStream.isLoading ? (priceStream.status || "Analyzing…") : "Suggest"}
                 </button>
               </div>
               <Input
@@ -300,8 +324,6 @@ export default function AddProductPage() {
           </h2>
           <DemandMeter
             productName={formData.name}
-            description={formData.description}
-            price={formData.price}
             onDemandChange={handleDemandChange}
           />
         </div>
