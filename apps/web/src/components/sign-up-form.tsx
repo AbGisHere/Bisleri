@@ -26,7 +26,7 @@ export default function SignUpForm({
         { name: value.name, email: value.email, password: value.password },
         {
           onSuccess: () => {
-            router.push("/dashboard");
+            router.push("/onboarding");
             toast.success("Account created!");
           },
           onError: (error) => {

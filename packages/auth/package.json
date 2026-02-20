@@ -9,7 +9,9 @@
       "default": "./src/*.ts"
     }
   },
-  "scripts": {},
+  "scripts": {
+    "auth:generate": "dotenv -e ../../apps/web/.env -- npx @better-auth/cli generate --config ./src/index.ts --output ../db/src/schema/auth.ts --y"
+  },
   "dependencies": {
     "@bisleri/db": "workspace:*",
     "@bisleri/env": "workspace:*",
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@bisleri/config": "workspace:*",
+    "dotenv-cli": "^11.0.0",
     "typescript": "catalog:"
   }
 }

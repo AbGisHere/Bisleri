@@ -2,9 +2,9 @@ import { auth } from "@bisleri/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import Dashboard from "./dashboard";
+import Onboarding from "./onboarding";
 
-export default async function DashboardPage() {
+export default async function OnboardingPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -13,9 +13,9 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  if (!session.user.onboardingComplete) {
-    redirect("/onboarding");
+  if (session.user.onboardingComplete) {
+    redirect("/dashboard");
   }
 
-  return <Dashboard session={session} />;
+  return <Onboarding userName={session.user.name} />;
 }

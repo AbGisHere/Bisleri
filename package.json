@@ -27,7 +27,8 @@
     "db:start": "bun run --filter @bisleri/db db:start",
     "db:watch": "bun run --filter @bisleri/db db:watch",
     "db:stop": "bun run --filter @bisleri/db db:stop",
-    "db:down": "bun run --filter @bisleri/db db:down"
+    "db:down": "bun run --filter @bisleri/db db:down",
+    "auth:generate": "bun run --filter @bisleri/auth auth:generate"
   },
   "dependencies": {
     "@bisleri/env": "workspace:*",

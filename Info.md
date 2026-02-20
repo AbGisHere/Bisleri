@@ -79,7 +79,7 @@ A marketplace platform empowering rural women to sell local/handmade products, c
 ### To Do — Auth & Users
 - [ ] OTP-based login for rural women (phone number)
 - [ ] One-device-at-a-time session enforcement
-- [ ] Extended user profile schema (age, location, skills, role)
+- [x] Extended user profile schema (age, location, skills, role)
 - [ ] Role-based routing (buyer vs seller vs SHG)
 
 ### To Do — Micromarketplace
