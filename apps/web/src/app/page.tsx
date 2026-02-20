@@ -3,18 +3,18 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Store,
   Users,
 } from "lucide-react";
 import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
 import ChartLineIcon from "@/components/ui/chart-line-icon";
 import TruckElectricIcon from "@/components/ui/truck-electric-icon";
+import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 
 const FEATURES = [
   {
-    icon: Store,
+    icon: ScanBarcodeIcon,
     title: "Micromarketplace",
     desc: "Upload a photo, AI writes the description, suggests a price, and shows demand. List in minutes, not hours.",
   },
@@ -86,7 +86,7 @@ function FeatureCard({
   desc,
   index,
 }: {
-  icon: typeof Store | typeof BrainCircuitIcon | typeof ChartLineIcon | typeof TruckElectricIcon;
+  icon: typeof Users | typeof BrainCircuitIcon | typeof ChartLineIcon | typeof TruckElectricIcon | typeof ScanBarcodeIcon;
   title: string;
   desc: string;
   index: number;
@@ -96,13 +96,13 @@ function FeatureCard({
   const iconRef = useRef<any>(null);
 
   const handleMouseEnter = () => {
-    if ((Icon === BrainCircuitIcon || Icon === ChartLineIcon || Icon === TruckElectricIcon) && iconRef.current) {
+    if ((Icon === BrainCircuitIcon || Icon === ChartLineIcon || Icon === TruckElectricIcon || Icon === ScanBarcodeIcon) && iconRef.current) {
       iconRef.current.startAnimation();
     }
   };
 
   const handleMouseLeave = () => {
-    if ((Icon === BrainCircuitIcon || Icon === ChartLineIcon || Icon === TruckElectricIcon) && iconRef.current) {
+    if ((Icon === BrainCircuitIcon || Icon === ChartLineIcon || Icon === TruckElectricIcon || Icon === ScanBarcodeIcon) && iconRef.current) {
       iconRef.current.stopAnimation();
     }
   };
@@ -124,6 +124,8 @@ function FeatureCard({
           <ChartLineIcon ref={iconRef} size={20} className="text-primary" />
         ) : Icon === TruckElectricIcon ? (
           <TruckElectricIcon ref={iconRef} size={20} className="text-primary" />
+        ) : Icon === ScanBarcodeIcon ? (
+          <ScanBarcodeIcon ref={iconRef} size={20} className="text-primary" />
         ) : (
           <Icon className="w-5 h-5 text-primary" />
         )}

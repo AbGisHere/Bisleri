@@ -10,6 +10,7 @@ import { useRef } from "react";
 import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
 import ChartLineIcon from "@/components/ui/chart-line-icon";
 import TruckElectricIcon from "@/components/ui/truck-electric-icon";
+import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
 
 export interface WorkspaceItem {
   icon: LucideIcon | ((props: { className?: string }) => ReactNode);
@@ -130,6 +131,14 @@ export default function DashboardLayout({
                   />
                 ) : mod.icon === TruckElectricIcon ? (
                   <TruckElectricIcon 
+                    ref={(ref) => {
+                      if (ref) iconRefs.current[mod.title] = ref;
+                    }}
+                    size={20} 
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                  />
+                ) : mod.icon === ScanBarcodeIcon ? (
+                  <ScanBarcodeIcon 
                     ref={(ref) => {
                       if (ref) iconRefs.current[mod.title] = ref;
                     }}
