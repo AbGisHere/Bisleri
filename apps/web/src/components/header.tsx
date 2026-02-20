@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -41,9 +42,9 @@ export default function Header() {
           ? "/shg/dashboard"
           : "/seller/dashboard";
 
-  const links = [
-    { to: "/" as string, label: "Home" },
-    { to: dashboardHref as string, label: "Dashboard" },
+  const links: { to: Route; label: string }[] = [
+    { to: "/" as Route, label: "Home" },
+    { to: dashboardHref as Route, label: "Dashboard" },
   ];
 
   return (
@@ -68,7 +69,7 @@ export default function Header() {
               return (
                 <Link
                   key={label}
-                  href={to as "/"}
+                  href={to}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     active
                       ? "bg-primary/10 text-primary"
@@ -112,7 +113,7 @@ export default function Header() {
               return (
                 <Link
                   key={label}
-                  href={to as "/"}
+                  href={to}
                   onClick={closeMobileMenu}
                   className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     active

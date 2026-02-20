@@ -36,6 +36,14 @@ export default function RootLayout({
           <div className="min-h-svh flex flex-col">
             <Header />
             <main className="flex-1">{children}</main>
+            <footer className="px-4 sm:px-6 lg:px-8 py-8 border-t border-border/50">
+              <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
+                <span className="font-display font-semibold text-foreground">
+                  Bisleri
+                </span>
+                <span>Empowering rural women across India</span>
+              </div>
+            </footer>
           </div>
         </Providers>
       </body>

@@ -103,12 +103,10 @@ export default function Page() {
                 title: "Demand Prediction",
                 desc: "Know what\u2019s trending before others. Seasonal forecasts and regional heatmaps for smarter decisions.",
               },
-            ].map((item, i) => (
+            ].map((item) => (
               <div
                 key={item.title}
-                className={`rounded-2xl border border-border/60 bg-card p-7 ${
-                  i >= 3 ? "sm:col-span-1" : ""
-                } ${i === 4 ? "lg:col-span-1 sm:col-span-2 lg:col-auto" : ""}`}
+                className="rounded-2xl border border-border/60 bg-card p-7"
               >
                 <item.icon className="w-6 h-6 text-primary mb-5" />
                 <h3 className="font-display text-lg font-bold mb-2">
@@ -165,7 +163,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="px-4 sm:px-6 lg:px-8 py-32 bg-primary text-primary-foreground">
+      <section className="px-4 sm:px-6 lg:px-8 py-32 bg-primary text-primary-foreground dark:bg-card dark:text-foreground dark:border-y dark:border-border">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
             Your hands create.
@@ -175,7 +173,7 @@ export default function Page() {
           <div className="mt-10">
             <Link
               href="/login"
-              className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-primary-foreground text-primary font-bold text-lg hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-primary-foreground text-primary dark:bg-primary dark:text-primary-foreground font-bold text-lg hover:opacity-90 transition-opacity"
             >
               Join Bisleri
               <ArrowRight className="w-5 h-5" />
@@ -183,15 +181,6 @@ export default function Page() {
           </div>
         </div>
       </section>
-
-      <footer className="px-4 sm:px-6 lg:px-8 py-8 border-t border-border/50">
-        <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
-          <span className="font-display font-semibold text-foreground">
-            Bisleri
-          </span>
-          <span>Empowering rural women across India</span>
-        </div>
-      </footer>
 
     </>
   );

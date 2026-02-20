@@ -24,12 +24,12 @@ export default function LoginPage() {
           ))}
         </div>
 
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+        <div className="relative z-10 flex flex-col p-12 w-full">
           <span className="font-display text-xl font-bold">
             Bisleri
           </span>
 
-          <div>
+          <div className="mt-auto">
             <h2 className="font-display text-5xl font-bold leading-[1.1] mb-6">
               Your craft,
               <br />
@@ -40,8 +40,6 @@ export default function LoginPage() {
               you do.
             </p>
           </div>
-
-          <div />
         </div>
       </div>
 
