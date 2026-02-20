@@ -1,61 +1,73 @@
+"use client";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
-
-import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
 
 export default function UserMenu() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
-    return <Skeleton className="h-9 w-24" />;
+    return <div className="h-10 w-24 rounded-full bg-muted/50 animate-pulse" />;
   }
 
   if (!session) {
     return (
-      <Link href="/login">
-        <Button variant="outline">Sign In</Button>
+      <Link
+        href="/login"
+        className="h-10 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium flex items-center hover:opacity-90 transition-opacity"
+      >
+        Sign In
       </Link>
     );
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
-        {session.user.name}
+      <DropdownMenuTrigger asChild>
+        <button className="h-10 pl-1.5 pr-4 rounded-full bg-muted/50 hover:bg-muted text-sm font-medium flex items-center gap-2.5 transition-colors cursor-pointer outline-none">
+          <span className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold">
+            {session.user.name.charAt(0).toUpperCase()}
+          </span>
+          <span className="text-foreground/80">{session.user.name}</span>
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-card">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => {
-              authClient.signOut({
-                fetchOptions: {
-                  onSuccess: () => {
-                    router.push("/");
-                  },
-                },
-              });
-            }}
-          >
-            Sign Out
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+      <DropdownMenuContent
+        className="min-w-[220px] rounded-2xl border-border/50 bg-card/95 backdrop-blur-xl p-2 shadow-xl shadow-black/10"
+        align="end"
+        sideOffset={8}
+      >
+        <div className="flex items-center gap-3 px-3 py-3">
+          <span className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-bold shrink-0">
+            {session.user.name.charAt(0).toUpperCase()}
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-medium truncate">{session.user.name}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {session.user.email}
+            </p>
+          </div>
+        </div>
+        <div className="h-px bg-border/50 mx-2 my-1" />
+        <button
+          onClick={() => {
+            authClient.signOut({
+              fetchOptions: {
+                onSuccess: () => router.push("/"),
+              },
+            });
+          }}
+          className="w-full text-left text-sm text-destructive px-3 py-2.5 rounded-xl hover:bg-destructive/10 transition-colors cursor-pointer"
+        >
+          Sign Out
+        </button>
       </DropdownMenuContent>
     </DropdownMenu>
   );

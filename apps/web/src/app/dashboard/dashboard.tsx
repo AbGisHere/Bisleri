@@ -1,6 +1,132 @@
 "use client";
+
+import {
+  Store,
+  Truck,
+  Users,
+  Brain,
+  TrendingUp,
+  Plus,
+  ArrowRight,
+} from "lucide-react";
+import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 
-export default function Dashboard({ session }: { session: typeof authClient.$Infer.Session }) {
-  return <></>;
+export default function Dashboard({
+  session,
+}: {
+  session: typeof authClient.$Infer.Session;
+}) {
+  const firstName = session.user.name.split(" ")[0];
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  return (
+    <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto">
+      {/* Greeting — large, personal */}
+      <div className="pb-10 border-b border-border/50 mb-10">
+        <p className="text-sm text-muted-foreground mb-1">{greeting}</p>
+        <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-bold">
+          {firstName}
+        </h1>
+      </div>
+
+      {/* Primary action — prominent new listing CTA */}
+      <Link
+        href="#"
+        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl bg-primary text-primary-foreground mb-10 hover:opacity-95 transition-opacity"
+      >
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-primary-foreground/15 flex items-center justify-center">
+            <Plus className="w-7 h-7" />
+          </div>
+          <div>
+            <div className="text-xl font-semibold">List a new product</div>
+            <div className="text-primary-foreground/65 text-sm mt-0.5">
+              Upload a photo and let AI do the rest
+            </div>
+          </div>
+        </div>
+        <ArrowRight className="w-6 h-6 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+      </Link>
+
+      {/* Modules as a compact list with status */}
+      <div className="mb-10">
+        <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
+          Your Workspace
+        </h2>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {[
+            {
+              icon: Store,
+              title: "Marketplace",
+              desc: "Products, orders, payouts",
+              tag: "0 listed",
+              color: "text-terracotta bg-terracotta-light",
+            },
+            {
+              icon: Users,
+              title: "SHG Network",
+              desc: "Connect, learn, grow",
+              tag: "Explore",
+              color: "text-clay bg-saffron-light",
+            },
+            {
+              icon: Brain,
+              title: "AI Pricing",
+              desc: "Smart price suggestions",
+              tag: "Ready",
+              color: "text-terracotta bg-terracotta-light",
+            },
+            {
+              icon: TrendingUp,
+              title: "Demand Insights",
+              desc: "Trends & forecasts",
+              tag: "Ready",
+              color: "text-forest bg-forest-light",
+            },
+            {
+              icon: Truck,
+              title: "Logistics",
+              desc: "Shipping & delivery",
+              tag: "0 active",
+              color: "text-forest bg-forest-light",
+            },
+          ].map((mod) => (
+            <Link
+              key={mod.title}
+              href="#"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all"
+            >
+              <div
+                className={`w-11 h-11 rounded-xl ${mod.color} flex items-center justify-center shrink-0`}
+              >
+                <mod.icon className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm">{mod.title}</div>
+                <div className="text-xs text-muted-foreground">{mod.desc}</div>
+              </div>
+              <span className="text-xs text-muted-foreground shrink-0">
+                {mod.tag}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Activity placeholder */}
+      <div>
+        <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
+          Recent Activity
+        </h2>
+        <div className="rounded-2xl border border-dashed border-border p-12 text-center">
+          <p className="text-muted-foreground text-sm">
+            No activity yet. List your first product to get started.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
