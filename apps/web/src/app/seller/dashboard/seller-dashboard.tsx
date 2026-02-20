@@ -35,15 +35,15 @@ export default function SellerDashboard({
       {/* List product CTA */}
       <Link
         href="#"
-        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl bg-primary text-primary-foreground mb-10 hover:opacity-95 transition-opacity"
+        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl bg-primary text-primary-foreground dark:bg-primary/10 dark:text-foreground dark:border dark:border-primary/25 mb-10 hover:opacity-95 transition-opacity"
       >
         <div className="flex items-center gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-primary-foreground/15 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-primary-foreground/15 dark:bg-primary/15 flex items-center justify-center">
             <Plus className="w-7 h-7" />
           </div>
           <div>
             <div className="text-xl font-semibold">List a new product</div>
-            <div className="text-primary-foreground/65 text-sm mt-0.5">
+            <div className="text-primary-foreground/65 dark:text-muted-foreground text-sm mt-0.5">
               Upload a photo and let AI do the rest
             </div>
           </div>
@@ -62,34 +62,34 @@ export default function SellerDashboard({
               title: "Marketplace",
               desc: "Products, orders, payouts",
               tag: "0 listed",
-              color: "text-terracotta bg-terracotta-light",
+              color: "text-primary bg-primary/8 dark:bg-primary/15",
             },
             {
               icon: Brain,
               title: "AI Pricing",
               desc: "Smart price suggestions",
               tag: "Ready",
-              color: "text-terracotta bg-terracotta-light",
+              color: "text-primary bg-primary/8 dark:bg-primary/15",
             },
             {
               icon: TrendingUp,
               title: "Demand Insights",
               desc: "Trends & forecasts",
               tag: "Ready",
-              color: "text-forest bg-forest-light",
+              color: "text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15",
             },
             {
               icon: Truck,
               title: "Logistics",
               desc: "Shipping & delivery",
               tag: "0 active",
-              color: "text-forest bg-forest-light",
+              color: "text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15",
             },
           ].map((mod) => (
             <Link
               key={mod.title}
               href="#"
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
             >
               <div
                 className={`w-11 h-11 rounded-xl ${mod.color} flex items-center justify-center shrink-0`}

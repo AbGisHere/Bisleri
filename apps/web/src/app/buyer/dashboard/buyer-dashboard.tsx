@@ -40,15 +40,15 @@ export default function BuyerDashboard({
       {/* Browse CTA */}
       <Link
         href="#"
-        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl bg-primary text-primary-foreground mb-10 hover:opacity-95 transition-opacity"
+        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl bg-primary text-primary-foreground dark:bg-primary/10 dark:text-foreground dark:border dark:border-primary/25 mb-10 hover:opacity-95 transition-opacity"
       >
         <div className="flex items-center gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-primary-foreground/15 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-primary-foreground/15 dark:bg-primary/15 flex items-center justify-center">
             <Store className="w-7 h-7" />
           </div>
           <div>
             <div className="text-xl font-semibold">Browse Products</div>
-            <div className="text-primary-foreground/65 text-sm mt-0.5">
+            <div className="text-primary-foreground/65 dark:text-muted-foreground text-sm mt-0.5">
               Discover products from rural artisans and SHGs
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function BuyerDashboard({
               title: "My Orders",
               desc: "Track your purchases",
               tag: "0 orders",
-              color: "text-terracotta bg-terracotta-light",
+              color: "text-primary bg-primary/8 dark:bg-primary/15",
               isCart: true,
             },
             {
@@ -75,7 +75,7 @@ export default function BuyerDashboard({
               title: "Wishlist",
               desc: "Saved products",
               tag: "0 saved",
-              color: "text-clay bg-saffron-light",
+              color: "text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15",
               isHeart: true,
             },
             {
@@ -83,21 +83,21 @@ export default function BuyerDashboard({
               title: "Marketplace",
               desc: "Browse all products",
               tag: "Explore",
-              color: "text-terracotta bg-terracotta-light",
+              color: "text-primary bg-primary/8 dark:bg-primary/15",
             },
             {
               icon: TrendingUp,
               title: "Demand Insights",
               desc: "Trends & forecasts",
               tag: "Ready",
-              color: "text-forest bg-forest-light",
+              color: "text-accent-foreground bg-accent/10 dark:text-accent dark:bg-accent/15",
               isChart: true,
             },
           ].map((mod) => (
             <Link
               key={mod.title}
               href="#"
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
               onMouseEnter={() => {
                 if (mod.isCart) setIsCartHovered(true);
                 if (mod.isHeart) setIsHeartHovered(true);
