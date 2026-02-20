@@ -87,9 +87,9 @@ export default function SignUpForm({
                 }}
                 className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
-              {field.state.meta.errors.map((error) => (
-                <p key={error?.message} className="text-sm text-destructive">
-                  {error?.message}
+              {field.state.meta.errors.map((error, i) => (
+                <p key={i} className="text-sm text-destructive">
+                  {typeof error === "string" ? error : error?.message}
                 </p>
               ))}
             </div>
@@ -109,9 +109,9 @@ export default function SignUpForm({
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
-              {field.state.meta.errors.map((error) => (
-                <p key={error?.message} className="text-sm text-destructive">
-                  {error?.message}
+              {field.state.meta.errors.map((error, i) => (
+                <p key={i} className="text-sm text-destructive">
+                  {typeof error === "string" ? error : error?.message}
                 </p>
               ))}
             </div>
@@ -131,9 +131,9 @@ export default function SignUpForm({
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="h-12 rounded-xl px-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
               />
-              {field.state.meta.errors.map((error) => (
-                <p key={error?.message} className="text-sm text-destructive">
-                  {error?.message}
+              {field.state.meta.errors.map((error, i) => (
+                <p key={i} className="text-sm text-destructive">
+                  {typeof error === "string" ? error : error?.message}
                 </p>
               ))}
             </div>

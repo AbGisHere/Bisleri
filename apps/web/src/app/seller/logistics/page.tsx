@@ -1,145 +1,88 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ArrowLeft, MapPin, Package, CheckCircle2, Clock, Truck, RotateCcw, Circle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { format } from "date-fns";
 
-type ShipmentStatus = "pending" | "transit" | "out_for_delivery" | "delivered" | "returned";
+type OrderStatus = "pending" | "shipped" | "delivered" | "returned";
 
-interface Shipment {
+interface Order {
   id: string;
-  orderId: string;
-  product: string;
-  buyer: string;
-  destination: string;
-  status: ShipmentStatus;
-  date: string;
-  amount: number;
+  status: OrderStatus;
+  quantity: number;
+  totalAmount: string;
+  buyerAddress: string | null;
+  createdAt: string;
+  updatedAt: string;
+  productId: string;
+  productName: string | null;
+  productLocation: string | null;
+  buyerId: string;
+  buyerName: string | null;
+  sellerId: string;
 }
 
-const ACTIVE: Shipment[] = [
-  {
-    id: "s1",
-    orderId: "ORD-8821",
-    product: "Handwoven Dhurrie Rug",
-    buyer: "Ananya Sharma",
-    destination: "Mumbai, Maharashtra",
-    status: "transit",
-    date: "Est. 22 Feb",
-    amount: 2400,
-  },
-  {
-    id: "s2",
-    orderId: "ORD-8817",
-    product: "Bamboo Storage Basket",
-    buyer: "Rahul Mehta",
-    destination: "Bengaluru, Karnataka",
-    status: "out_for_delivery",
-    date: "Today",
-    amount: 180,
-  },
-  {
-    id: "s3",
-    orderId: "ORD-8810",
-    product: "Block Print Kurta",
-    buyer: "Priya Singh",
-    destination: "Pune, Maharashtra",
-    status: "pending",
-    date: "Pickup tomorrow",
-    amount: 850,
-  },
-];
-
-const COMPLETED: Shipment[] = [
-  {
-    id: "s4",
-    orderId: "ORD-8804",
-    product: "Madhubani Wall Painting",
-    buyer: "Vikram Nair",
-    destination: "Delhi, NCR",
-    status: "delivered",
-    date: "17 Feb",
-    amount: 1200,
-  },
-  {
-    id: "s5",
-    orderId: "ORD-8799",
-    product: "Silver Filigree Earrings",
-    buyer: "Kavya Reddy",
-    destination: "Hyderabad, Telangana",
-    status: "delivered",
-    date: "14 Feb",
-    amount: 680,
-  },
-  {
-    id: "s6",
-    orderId: "ORD-8791",
-    product: "Terracotta Wind Chimes",
-    buyer: "Arjun Patel",
-    destination: "Ahmedabad, Gujarat",
-    status: "returned",
-    date: "10 Feb",
-    amount: 340,
-  },
-];
-
-const STATUS_CONFIG: Record<ShipmentStatus, { label: string; icon: typeof Clock; className: string; dotColor: string }> = {
+const STATUS_CONFIG: Record<OrderStatus, { label: string; className: string; icon: typeof Clock }> = {
   pending: {
     label: "Pending pickup",
-    icon: Circle,
     className: "bg-muted text-muted-foreground",
-    dotColor: "bg-muted-foreground/40",
+    icon: Circle,
   },
-  transit: {
+  shipped: {
     label: "In transit",
-    icon: Truck,
     className: "bg-saffron/20 text-accent-foreground dark:bg-saffron/15 dark:text-saffron",
-    dotColor: "bg-saffron",
-  },
-  out_for_delivery: {
-    label: "Out for delivery",
     icon: Truck,
-    className: "bg-primary/10 text-primary",
-    dotColor: "bg-primary",
   },
   delivered: {
     label: "Delivered",
-    icon: CheckCircle2,
     className: "bg-forest/10 text-forest dark:bg-forest/20 dark:text-forest",
-    dotColor: "bg-forest",
+    icon: CheckCircle2,
   },
   returned: {
     label: "Returned",
-    icon: RotateCcw,
     className: "bg-destructive/10 text-destructive",
-    dotColor: "bg-destructive",
+    icon: RotateCcw,
   },
 };
 
-function ShipmentRow({ shipment }: { shipment: Shipment }) {
-  const cfg = STATUS_CONFIG[shipment.status];
+function ShipmentRow({ order }: { order: Order }) {
+  const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+  const dateStr = (() => {
+    try {
+      return format(new Date(order.updatedAt), "dd MMM");
+    } catch {
+      return "";
+    }
+  })();
+
   return (
     <div className="flex items-center gap-4 py-4 border-b border-border last:border-0">
-      <div className="w-10 h-10 rounded-xl bg-primary/8 dark:bg-primary/12 flex items-center justify-center shrink-0">
-        <Package className="w-4.5 h-4.5 text-primary" />
+      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+        <Package className="w-4 h-4 text-primary" />
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <p className="text-sm font-medium truncate">{shipment.product}</p>
-          <span className="text-xs text-muted-foreground shrink-0">{shipment.orderId}</span>
+          <p className="text-sm font-medium truncate">{order.productName ?? "Product"}</p>
+          <span className="text-xs text-muted-foreground shrink-0 font-mono">
+            {order.id.slice(0, 8).toUpperCase()}
+          </span>
         </div>
         <p className="text-xs text-muted-foreground flex items-center gap-1">
           <MapPin className="w-3 h-3 shrink-0" />
-          {shipment.destination}
+          {order.buyerAddress ?? "—"}
           <span className="text-border mx-1">·</span>
-          {shipment.buyer}
+          {order.buyerName ?? "Buyer"}
         </p>
       </div>
 
       <div className="text-right shrink-0 hidden sm:block">
-        <p className="text-sm font-medium">₹{shipment.amount.toLocaleString("en-IN")}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{shipment.date}</p>
+        <p className="text-sm font-medium">
+          ₹{parseFloat(order.totalAmount).toLocaleString("en-IN")}
+        </p>
+        <p className="text-xs text-muted-foreground mt-0.5">{dateStr}</p>
       </div>
 
       <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${cfg.className}`}>
@@ -149,19 +92,47 @@ function ShipmentRow({ shipment }: { shipment: Shipment }) {
   );
 }
 
-const delivered = COMPLETED.filter((s) => s.status === "delivered").length;
-const returned = COMPLETED.filter((s) => s.status === "returned").length;
-const totalRevenue = COMPLETED.filter((s) => s.status === "delivered").reduce((acc, s) => acc + s.amount, 0);
-
-const STATS = [
-  { label: "Active", value: ACTIVE.length.toString(), sub: "in progress" },
-  { label: "Delivered", value: delivered.toString(), sub: "this month" },
-  { label: "Returned", value: returned.toString(), sub: "this month" },
-  { label: "Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, sub: "from deliveries" },
-];
+function SkeletonRow() {
+  return (
+    <div className="flex items-center gap-4 py-4 border-b border-border last:border-0 animate-pulse">
+      <div className="w-10 h-10 rounded-xl bg-muted shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="h-3.5 bg-muted rounded w-2/3" />
+        <div className="h-3 bg-muted rounded w-1/2" />
+      </div>
+      <div className="h-6 bg-muted rounded-full w-24 shrink-0" />
+    </div>
+  );
+}
 
 export default function LogisticsPage() {
   const router = useRouter();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/orders")
+      .then((r) => r.json())
+      .then((data) => setOrders(data.orders ?? []))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const active = orders.filter((o) => o.status === "pending" || o.status === "shipped");
+  const completed = orders.filter((o) => o.status === "delivered" || o.status === "returned");
+
+  const deliveredCount = orders.filter((o) => o.status === "delivered").length;
+  const returnedCount = orders.filter((o) => o.status === "returned").length;
+  const revenue = orders
+    .filter((o) => o.status === "delivered")
+    .reduce((sum, o) => sum + parseFloat(o.totalAmount), 0);
+
+  const STATS = [
+    { label: "Active", value: active.length.toString(), sub: "in progress" },
+    { label: "Delivered", value: deliveredCount.toString(), sub: "this month" },
+    { label: "Returned", value: returnedCount.toString(), sub: "this month" },
+    { label: "Revenue", value: `₹${revenue.toLocaleString("en-IN")}`, sub: "from deliveries" },
+  ];
+
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto">
       {/* Header */}
@@ -203,14 +174,16 @@ export default function LogisticsPage() {
           <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
             Active Shipments
           </h2>
-          <span className="text-xs text-muted-foreground">{ACTIVE.length} orders</span>
+          {!loading && <span className="text-xs text-muted-foreground">{active.length} orders</span>}
         </div>
 
-        {ACTIVE.length > 0 ? (
-          <div className="rounded-2xl border border-border px-4 sm:px-6 divide-y-0">
-            {ACTIVE.map((s) => (
-              <ShipmentRow key={s.id} shipment={s} />
-            ))}
+        {loading ? (
+          <div className="rounded-2xl border border-border px-4 sm:px-6">
+            {Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)}
+          </div>
+        ) : active.length > 0 ? (
+          <div className="rounded-2xl border border-border px-4 sm:px-6">
+            {active.map((o) => <ShipmentRow key={o.id} order={o} />)}
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-border p-12 text-center">
@@ -225,14 +198,22 @@ export default function LogisticsPage() {
           <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
             Recent Activity
           </h2>
-          <span className="text-xs text-muted-foreground">{COMPLETED.length} orders</span>
+          {!loading && <span className="text-xs text-muted-foreground">{completed.length} orders</span>}
         </div>
 
-        <div className="rounded-2xl border border-border px-4 sm:px-6 divide-y-0">
-          {COMPLETED.map((s) => (
-            <ShipmentRow key={s.id} shipment={s} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="rounded-2xl border border-border px-4 sm:px-6">
+            {Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)}
+          </div>
+        ) : completed.length > 0 ? (
+          <div className="rounded-2xl border border-border px-4 sm:px-6">
+            {completed.map((o) => <ShipmentRow key={o.id} order={o} />)}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-border p-12 text-center">
+            <p className="text-muted-foreground text-sm">No completed orders yet.</p>
+          </div>
+        )}
       </div>
     </div>
   );

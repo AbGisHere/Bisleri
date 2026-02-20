@@ -5,6 +5,7 @@ import type { AnimatedIconHandle } from "@/components/ui/types";
 import { ArrowLeft, MapPin, Package } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -13,13 +14,15 @@ import SparklesIcon from "@/components/ui/sparkles-icon";
 import { LoadingIcon } from "@/components/ui/loading-icon";
 import CameraIcon from "@/components/ui/camera-icon";
 
+const CATEGORIES = ["Weaving", "Pottery", "Embroidery", "Food", "Jewellery", "Painting", "Basket Weaving", "Tailoring"];
+
 export default function AddProductPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    image: "",
     imagePreview: "",
     name: "",
     description: "",
+    category: "",
     price: "",
     demandScale: 0,
     quantity: "",
@@ -27,6 +30,7 @@ export default function AddProductPage() {
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const descSparkleRef = useRef<AnimatedIconHandle>(null);
   const priceSparkleRef = useRef<AnimatedIconHandle>(null);
 
@@ -41,7 +45,6 @@ export default function AddProductPage() {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      handleInputChange("image", file.name);
       const reader = new FileReader();
       reader.onload = (e) => {
         setFormData(prev => ({ ...prev, imagePreview: e.target?.result as string }));
@@ -50,9 +53,38 @@ export default function AddProductPage() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log("Product data:", formData);
+    if (!formData.name || !formData.price || !formData.quantity || !formData.location) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description || undefined,
+          category: formData.category || undefined,
+          price: formData.price.replace(/[^0-9.]/g, ""),
+          quantity: Number(formData.quantity),
+          location: formData.location,
+          demandScale: formData.demandScale || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "Failed to list product");
+      }
+      toast.success("Product listed!");
+      router.push("/marketplace");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -161,6 +193,26 @@ export default function AddProductPage() {
                 className="rounded-xl px-4 py-3 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50 resize-none"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Category</Label>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => handleInputChange("category", formData.category === cat ? "" : cat)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                      formData.category === cat
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border/50 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -256,9 +308,10 @@ export default function AddProductPage() {
         <div className="flex items-center gap-4 pt-2">
           <button
             type="submit"
-            className="flex-1 h-12 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+            disabled={isSubmitting}
+            className="flex-1 h-12 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            List Product
+            {isSubmitting ? "Listing…" : "List Product"}
           </button>
           <Link
             href="/seller/dashboard"

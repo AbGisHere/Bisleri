@@ -14,6 +14,7 @@ export const product = pgTable(
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     description: text("description"),
+    category: text("category"),
     price: decimal("price", { precision: 10, scale: 2 }).notNull(),
     quantity: integer("quantity").notNull().default(1),
     location: text("location").notNull(),

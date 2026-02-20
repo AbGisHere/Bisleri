@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Store } from "lucide-react";
 import type { Route } from "next";
 import ShoppingCartIcon from "@/components/ui/shopping-cart-icon";
@@ -9,39 +10,48 @@ import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
 import type { Session } from "@/lib/types";
 
-const WORKSPACE_ITEMS: WorkspaceItem[] = [
-  {
-    icon: ShoppingCartIcon,
-    title: "My Orders",
-    desc: "Track your purchases",
-    tag: "0 orders",
-    color: "primary",
-  },
-  {
-    icon: ScanHeartIcon,
-    title: "Wishlist",
-    desc: "Saved products",
-    tag: "0 saved",
-    color: "accent",
-  },
-  {
-    icon: Store,
-    title: "Marketplace",
-    desc: "Browse all products",
-    tag: "Explore",
-    color: "primary",
-    href: "/marketplace",
-  },
-  {
-    icon: ChartLineIcon,
-    title: "Demand Insights",
-    desc: "Trends & forecasts",
-    tag: "Ready",
-    color: "accent",
-  },
-];
-
 export default function BuyerDashboard({ session }: { session: Session }) {
+  const [stats, setStats] = useState<{ orders: number } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then(setStats)
+      .catch(() => {});
+  }, []);
+
+  const workspaceItems: WorkspaceItem[] = [
+    {
+      icon: ShoppingCartIcon,
+      title: "My Orders",
+      desc: "Track your purchases",
+      tag: stats ? `${stats.orders} orders` : "…",
+      color: "primary",
+    },
+    {
+      icon: ScanHeartIcon,
+      title: "Wishlist",
+      desc: "Saved products",
+      tag: "0 saved",
+      color: "accent",
+    },
+    {
+      icon: Store,
+      title: "Marketplace",
+      desc: "Browse all products",
+      tag: "Explore",
+      color: "primary",
+      href: "/marketplace",
+    },
+    {
+      icon: ChartLineIcon,
+      title: "Demand Insights",
+      desc: "Trends & forecasts",
+      tag: "Ready",
+      color: "accent",
+    },
+  ];
+
   return (
     <DashboardLayout
       session={session}
@@ -52,7 +62,7 @@ export default function BuyerDashboard({ session }: { session: Session }) {
         desc: "Discover products from rural artisans and SHGs",
         href: "/marketplace" as Route,
       }}
-      workspaceItems={WORKSPACE_ITEMS}
+      workspaceItems={workspaceItems}
       emptyActivityMessage="No activity yet. Browse the marketplace to get started."
     />
   );
