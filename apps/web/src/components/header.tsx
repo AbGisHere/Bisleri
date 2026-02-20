@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { ModeToggle } from "./mode-toggle";
@@ -13,6 +13,23 @@ export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session } = authClient.useSession();
+  const mobileNavRef = useRef<HTMLElement>(null);
+
+  const closeMobileMenu = useCallback(() => setMobileOpen(false), []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") closeMobileMenu();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen, closeMobileMenu]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    closeMobileMenu();
+  }, [pathname, closeMobileMenu]);
 
   const role = session?.user?.role || "seller";
   const dashboardHref =
@@ -69,7 +86,10 @@ export default function Header() {
             <UserMenu />
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center transition-colors"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              className="md:hidden w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -77,7 +97,13 @@ export default function Header() {
         </div>
 
         {mobileOpen && (
-          <nav className="md:hidden pb-4 flex flex-col gap-1">
+          <nav
+            id="mobile-nav"
+            ref={mobileNavRef}
+            role="navigation"
+            aria-label="Mobile navigation"
+            className="md:hidden pb-4 flex flex-col gap-1"
+          >
             {links.map(({ to, label }) => {
               const active =
                 to === "/"
@@ -87,7 +113,7 @@ export default function Header() {
                 <Link
                   key={label}
                   href={to as "/"}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMobileMenu}
                   className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     active
                       ? "bg-primary/10 text-primary"
