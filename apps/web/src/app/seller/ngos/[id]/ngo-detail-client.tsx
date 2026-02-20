@@ -249,13 +249,20 @@ export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
                     <button
                       onClick={() => handleEnroll(w.id, w.enrolled)}
                       disabled={isEnrolling || (isFull && !w.enrolled)}
-                      className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium backdrop-blur-xl transition-all duration-200 disabled:opacity-50 ${
                         w.enrolled
-                          ? "bg-forest/10 text-forest dark:bg-forest/20 hover:bg-destructive/10 hover:text-destructive"
+                          ? "bg-forest/15 border border-forest/25 text-forest dark:bg-forest/20 hover:-translate-y-0.5 hover:bg-destructive/15 hover:border-destructive/25 hover:text-destructive active:translate-y-0"
                           : isFull
-                          ? "bg-muted text-muted-foreground cursor-not-allowed"
-                          : "bg-primary text-primary-foreground hover:opacity-90"
-                      } disabled:opacity-50`}
+                          ? "bg-muted/60 border border-border/50 text-muted-foreground cursor-not-allowed"
+                          : "bg-primary/80 border border-white/15 text-primary-foreground hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0"
+                      }`}
+                      style={{
+                        boxShadow: w.enrolled
+                          ? 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.08)'
+                          : isFull
+                          ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.04)'
+                          : 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)',
+                      }}
                     >
                       {isEnrolling ? (
                         <span>…</span>

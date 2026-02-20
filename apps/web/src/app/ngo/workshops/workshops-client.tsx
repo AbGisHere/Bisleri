@@ -135,7 +135,8 @@ export default function WorkshopsClient({ session: _session }: { session: Sessio
           </div>
           <button
             onClick={() => setShowForm((v) => !v)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground text-sm font-medium hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
           >
             {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm ? "Cancel" : "New Workshop"}
@@ -220,7 +221,8 @@ export default function WorkshopsClient({ session: _session }: { session: Sessio
             <button
               type="submit"
               disabled={creating}
-              className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="px-5 py-2 rounded-xl backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground text-sm font-medium hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:translate-y-0 disabled:cursor-not-allowed"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
             >
               {creating ? "Creating…" : "Create Workshop"}
             </button>
@@ -277,7 +279,8 @@ export default function WorkshopsClient({ session: _session }: { session: Sessio
                 </div>
                 <button
                   onClick={() => handleDelete(w.id)}
-                  className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                  className="p-2 rounded-lg backdrop-blur-xl bg-muted/40 border border-border/40 text-muted-foreground hover:bg-destructive/10 hover:border-destructive/20 hover:text-destructive transition-all duration-200 shrink-0"
+                  style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 1px 4px rgba(0,0,0,0.05)' }}
                   title="Delete workshop"
                 >
                   <Trash2 className="w-4 h-4" />

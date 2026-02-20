@@ -82,11 +82,16 @@ export default function Header() {
                 <Link
                   key={label}
                   href={to}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium backdrop-blur-xl border transition-all duration-200 ${
                     active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "bg-primary/10 border-primary/20 text-primary"
+                      : "border-transparent text-muted-foreground hover:bg-muted/40 hover:border-border/30 hover:text-foreground"
                   }`}
+                  style={{
+                    boxShadow: active
+                      ? 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 4px rgba(0,0,0,0.06)'
+                      : 'inset 0 1px 1px rgba(255,255,255,0.15), 0 1px 2px rgba(0,0,0,0.03)',
+                  }}
                 >
                   {label}
                 </Link>
@@ -143,11 +148,16 @@ export default function Header() {
                   key={label}
                   href={to}
                   onClick={closeMobileMenu}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  className={`px-4 py-2.5 rounded-xl text-sm font-medium backdrop-blur-xl border transition-all duration-200 ${
                     active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "bg-primary/10 border-primary/20 text-primary"
+                      : "border-transparent text-muted-foreground hover:bg-muted/40 hover:border-border/30 hover:text-foreground"
                   }`}
+                  style={{
+                    boxShadow: active
+                      ? 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 4px rgba(0,0,0,0.06)'
+                      : 'inset 0 1px 1px rgba(255,255,255,0.15), 0 1px 2px rgba(0,0,0,0.03)',
+                  }}
                 >
                   {label}
                 </Link>

@@ -121,7 +121,8 @@ export default function ProgramsClient({ session: _session }: { session: Session
           </div>
           <button
             onClick={() => setShowForm((v) => !v)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground text-sm font-medium hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
           >
             {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm ? "Cancel" : "New Program"}
@@ -170,11 +171,16 @@ export default function ProgramsClient({ session: _session }: { session: Session
                   key={skill}
                   type="button"
                   onClick={() => toggleSkill(skill)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-xl transition-all duration-200 ${
                     selectedSkills.includes(skill)
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      ? "bg-primary/20 border border-primary/30 text-primary"
+                      : "bg-muted/60 border border-border/50 text-muted-foreground hover:bg-muted/80 hover:border-border/70"
                   }`}
+                  style={{
+                    boxShadow: selectedSkills.includes(skill)
+                      ? 'inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.08)'
+                      : 'inset 0 1px 1px rgba(255,255,255,0.15), 0 1px 4px rgba(0,0,0,0.04)',
+                  }}
                 >
                   {skill}
                 </button>
@@ -195,7 +201,8 @@ export default function ProgramsClient({ session: _session }: { session: Session
             <button
               type="submit"
               disabled={creating}
-              className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="px-5 py-2 rounded-xl backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground text-sm font-medium hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:translate-y-0 disabled:cursor-not-allowed"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
             >
               {creating ? "Creating…" : "Create Program"}
             </button>
@@ -248,7 +255,8 @@ export default function ProgramsClient({ session: _session }: { session: Session
                 </div>
                 <button
                   onClick={() => handleDelete(p.id)}
-                  className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                  className="p-2 rounded-lg backdrop-blur-xl bg-muted/40 border border-border/40 text-muted-foreground hover:bg-destructive/10 hover:border-destructive/20 hover:text-destructive transition-all duration-200 shrink-0"
+                  style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 1px 4px rgba(0,0,0,0.05)' }}
                   title="Delete program"
                 >
                   <Trash2 className="w-4 h-4" />

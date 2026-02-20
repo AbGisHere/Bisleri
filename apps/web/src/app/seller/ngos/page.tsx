@@ -101,7 +101,8 @@ export default function NgosPage() {
                 </span>
                 <Link
                   href={`/seller/ngos/${ngo.id}`}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg backdrop-blur-xl bg-primary/10 border border-primary/20 text-primary text-xs font-medium hover:-translate-y-0.5 hover:bg-primary/15 active:translate-y-0 transition-all duration-200"
+                  style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.06)' }}
                 >
                   View
                   <ArrowRight className="w-3.5 h-3.5" />
