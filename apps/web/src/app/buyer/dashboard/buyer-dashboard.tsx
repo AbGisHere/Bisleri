@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Store } from "lucide-react";
+import { Store, ShoppingBag } from "lucide-react";
 import type { Route } from "next";
 import ShoppingCartIcon from "@/components/ui/shopping-cart-icon";
 import ScanHeartIcon from "@/components/ui/scan-heart-icon";
@@ -9,18 +9,15 @@ import ChartLineIcon from "@/components/ui/chart-line-icon";
 import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
 import type { Session } from "@/lib/types";
-import { getWishlist } from "@/app/buyer/wishlist/page";
 
 export default function BuyerDashboard({ session }: { session: Session }) {
-  const [stats, setStats] = useState<{ orders: number } | null>(null);
-  const [wishlistCount, setWishlistCount] = useState(0);
+  const [stats, setStats] = useState<{ orders: number; wishlist: number; cart: number } | null>(null);
 
   useEffect(() => {
     fetch("/api/stats")
       .then((r) => r.json())
       .then(setStats)
       .catch(() => {});
-    setWishlistCount(getWishlist().length);
   }, []);
 
   const workspaceItems: WorkspaceItem[] = [
@@ -36,9 +33,17 @@ export default function BuyerDashboard({ session }: { session: Session }) {
       icon: ScanHeartIcon,
       title: "Wishlist",
       desc: "Saved products",
-      tag: `${wishlistCount} saved`,
+      tag: stats ? `${stats.wishlist} saved` : "…",
       color: "accent",
       href: "/buyer/wishlist",
+    },
+    {
+      icon: ShoppingBag,
+      title: "Cart",
+      desc: "Items ready to order",
+      tag: stats ? `${stats.cart} item${stats.cart !== 1 ? "s" : ""}` : "…",
+      color: "accent",
+      href: "/buyer/cart",
     },
     {
       icon: Store,

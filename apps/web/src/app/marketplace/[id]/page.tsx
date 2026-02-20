@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowLeft, MapPin, Package, User, Tag, Heart } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, MapPin, Package, User, Tag, ShoppingCart } from "lucide-react";
+import ScanHeartIcon from "@/components/ui/scan-heart-icon";
+import type { AnimatedIconHandle } from "@/components/ui/types";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import { getWishlist, toggleWishlist } from "@/app/buyer/wishlist/page";
+import { getWishlistedIds, toggleWishlist } from "@/app/buyer/wishlist/page";
 
 interface Product {
   id: string;
@@ -86,17 +88,38 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
+  const [cartQuantity, setCartQuantity] = useState(0);
+  const [cartUpdating, setCartUpdating] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const wishlistIconRef = useRef<AnimatedIconHandle>(null);
 
   useEffect(() => {
-    if (id) setIsWishlisted(getWishlist().includes(id));
-  }, [id]);
+    if (!id || !session) return;
+    getWishlistedIds().then((ids) => setIsWishlisted(ids.includes(id)));
+    fetch("/api/cart")
+      .then((r) => r.json())
+      .then((data) => {
+        const item = (data.items ?? []).find((i: { id: string; quantity: number }) => i.id === id);
+        if (item) setCartQuantity(item.quantity);
+      })
+      .catch(() => {});
+  }, [id, session]);
 
-  const handleWishlist = () => {
-    if (!id) return;
-    const added = toggleWishlist(id);
-    setIsWishlisted(added);
-    toast.success(added ? "Added to wishlist" : "Removed from wishlist");
+  const handleWishlist = async () => {
+    if (!session) {
+      toast.error("Sign in to save products");
+      router.push("/login");
+      return;
+    }
+    wishlistIconRef.current?.startAnimation();
+    setTimeout(() => wishlistIconRef.current?.stopAnimation(), 400);
+    try {
+      const added = await toggleWishlist(id!);
+      setIsWishlisted(added);
+      toast.success(added ? "Added to wishlist" : "Removed from wishlist");
+    } catch {
+      toast.error("Failed to update wishlist");
+    }
   };
 
   useEffect(() => {
@@ -112,6 +135,57 @@ export default function ProductDetailPage() {
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id]);
+
+  const handleAddToCart = async () => {
+    if (!session) {
+      toast.error("Sign in to add to cart");
+      router.push("/login");
+      return;
+    }
+    setCartUpdating(true);
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product!.id, quantity: 1 }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to add to cart");
+      setCartQuantity(1);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setCartUpdating(false);
+    }
+  };
+
+  const handleCartQtyChange = async (delta: number) => {
+    const newQty = cartQuantity + delta;
+    setCartUpdating(true);
+    try {
+      if (newQty <= 0) {
+        const res = await fetch("/api/cart", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: product!.id }),
+        });
+        if (!res.ok) throw new Error();
+        setCartQuantity(0);
+      } else {
+        const res = await fetch("/api/cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: product!.id, quantity: newQty }),
+        });
+        if (!res.ok) throw new Error();
+        setCartQuantity(newQty);
+      }
+    } catch {
+      toast.error("Failed to update cart");
+    } finally {
+      setCartUpdating(false);
+    }
+  };
 
   const handleOrder = async () => {
     if (!session) {
@@ -267,30 +341,91 @@ export default function ProductDetailPage() {
               This is your listing
             </div>
           ) : (
-            <div className="flex gap-3 mt-2">
-              <button
-                onClick={handleOrder}
-                disabled={isOrdering || product.quantity === 0}
-                className="flex-1 h-12 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isOrdering
-                  ? "Placing order…"
-                  : product.quantity === 0
-                    ? "Out of stock"
-                    : isLoggedIn
-                      ? "Place Order"
-                      : "Sign in to Order"}
-              </button>
+            <div className="flex gap-2 mt-2">
+              {/* Left slot: counter when in cart, otherwise Add to Cart */}
+              {cartQuantity > 0 ? (
+                <div className={`flex-1 flex items-center justify-center gap-4 transition-opacity ${cartUpdating ? "opacity-50 pointer-events-none" : ""}`}>
+                  <button
+                    onClick={() => handleCartQtyChange(-1)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-primary/10 border border-primary/25 text-primary backdrop-blur-xl transition-all duration-200 hover:bg-primary/20 hover:border-primary/40 hover:scale-95 active:scale-90"
+                    style={{ boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.08)' }}
+                  >
+                    <span style={{ fontSize: '16px', fontWeight: 'bold', lineHeight: 1 }}>-</span>
+                  </button>
+                  <span className="w-6 text-center text-sm font-semibold tabular-nums">{cartQuantity}</span>
+                  <button
+                    onClick={() => handleCartQtyChange(1)}
+                    disabled={cartQuantity >= product.quantity}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-primary/10 border border-primary/25 text-primary backdrop-blur-xl transition-all duration-200 hover:bg-primary/20 hover:border-primary/40 hover:scale-95 active:scale-90 disabled:opacity-30 disabled:pointer-events-none"
+                    style={{ boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.08)' }}
+                  >
+                    <span style={{ fontSize: '16px', fontWeight: 'bold', lineHeight: 1 }}>+</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={cartUpdating || product.quantity === 0}
+                  className="flex-1 h-12 rounded-full border border-primary/40 bg-primary/10 backdrop-blur-xl text-primary font-semibold text-sm hover:bg-primary/15 hover:border-primary/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.06)' }}
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  {cartUpdating ? "Adding…" : "Add to Cart"}
+                </button>
+              )}
+
+              {/* Thank you note — shown when counter is active */}
+              {cartQuantity > 0 && (
+                <div
+                  className="flex-1 h-12 rounded-full border border-saffron/40 bg-saffron/10 backdrop-blur-xl flex items-center justify-center gap-1.5 px-3 overflow-hidden"
+                  style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5)' }}
+                >
+                  <span className="text-sm">🙏</span>
+                  <span className="text-xs font-medium text-accent-foreground/80 truncate">Thank you for supporting us!</span>
+                </div>
+              )}
+
+              {/* Place Order — hidden when counter is active */}
+              {cartQuantity === 0 && (
+                <button
+                  onClick={handleOrder}
+                  disabled={isOrdering || product.quantity === 0}
+                  className="flex-1 h-12 rounded-full backdrop-blur-xl bg-primary/75 border border-primary/30 text-primary-foreground font-semibold text-sm transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.25), 0 4px 16px rgba(0,0,0,0.15)' }}
+                >
+                  {isOrdering
+                    ? "Placing…"
+                    : product.quantity === 0
+                      ? "Out of stock"
+                      : isLoggedIn
+                        ? "Place Order"
+                        : "Sign in to Order"}
+                </button>
+              )}
+
+              {/* Wishlist */}
               <button
                 onClick={handleWishlist}
-                className={`w-12 h-12 rounded-full border flex items-center justify-center transition-colors shrink-0 ${
-                  isWishlisted
-                    ? "border-primary/40 bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:border-primary/30 hover:text-primary"
-                }`}
+                onMouseEnter={() => wishlistIconRef.current?.startAnimation()}
+                onMouseLeave={() => wishlistIconRef.current?.stopAnimation()}
                 title={isWishlisted ? "Remove from wishlist" : "Save to wishlist"}
+                className={`w-12 h-12 rounded-full border flex items-center justify-center shrink-0 backdrop-blur-xl transition-all duration-200 ${
+                  isWishlisted
+                    ? "border-red-400/50 bg-red-500/15 text-red-500 dark:bg-red-500/10 dark:text-red-400"
+                    : "border-border/60 bg-background/40 text-muted-foreground hover:border-red-300/70 hover:bg-red-500/8 hover:text-red-400"
+                }`}
+                style={{
+                  boxShadow: isWishlisted
+                    ? 'inset 0 1px 2px rgba(255,255,255,0.6), 0 2px 8px rgba(239,68,68,0.2)'
+                    : 'inset 0 1px 2px rgba(255,255,255,0.4), 0 1px 4px rgba(0,0,0,0.06)',
+                }}
               >
-                <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
+                <ScanHeartIcon
+                  ref={wishlistIconRef}
+                  size={18}
+                  color="currentColor"
+                  strokeWidth={isWishlisted ? 2.5 : 2}
+                />
               </button>
             </div>
           )}

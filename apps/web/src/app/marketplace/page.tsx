@@ -61,10 +61,15 @@ function ProductCard({ product }: { product: Product }) {
       href={`/marketplace/${product.id}` as never}
       className="group flex flex-col rounded-2xl border border-border overflow-hidden hover:shadow-md hover:shadow-primary/5 hover:border-primary/20 transition-all"
     >
-      <div className={`aspect-[4/3] bg-gradient-to-br ${gradientFor(product.id)} flex items-center justify-center`}>
-        <span className="font-display text-5xl text-foreground/20 select-none">
-          {product.name[0]}
-        </span>
+      <div className={`aspect-[4/3] bg-gradient-to-br ${gradientFor(product.id)} flex items-center justify-center overflow-hidden`}>
+        {product.imageUrl ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+        ) : (
+          <span className="font-display text-5xl text-foreground/20 select-none">
+            {product.name[0]}
+          </span>
+        )}
       </div>
       <div className="p-4 flex flex-col gap-3 flex-1">
         <div>

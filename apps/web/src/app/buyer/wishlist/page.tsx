@@ -1,33 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ArrowLeft, MapPin, Heart, Store } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-const WISHLIST_KEY = "rangaayan_wishlist";
-
-export function getWishlist(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(WISHLIST_KEY) ?? "[]");
-  } catch {
-    return [];
-  }
+// Exported so product detail page can use the same toggle logic
+export async function toggleWishlist(productId: string): Promise<boolean> {
+  const res = await fetch("/api/wishlist", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ productId }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? "Failed to update wishlist");
+  return data.wishlisted as boolean;
 }
 
-export function toggleWishlist(productId: string): boolean {
-  const list = getWishlist();
-  const idx = list.indexOf(productId);
-  if (idx === -1) {
-    list.push(productId);
-    localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
-    return true; // added
-  } else {
-    list.splice(idx, 1);
-    localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
-    return false; // removed
-  }
+export async function getWishlistedIds(): Promise<string[]> {
+  const res = await fetch("/api/wishlist");
+  if (!res.ok) return [];
+  const data = await res.json();
+  return (data.items ?? []).map((p: { id: string }) => p.id);
 }
 
 interface Product {
@@ -71,8 +65,22 @@ function gradientFor(id: string) {
 }
 
 function WishlistCard({ product, onRemove }: { product: Product; onRemove: (id: string) => void }) {
+  const [removing, setRemoving] = useState(false);
   const level = demandLevel(product.demandScale);
   const demand = DEMAND_STYLES[level];
+
+  const handleRemove = async () => {
+    setRemoving(true);
+    try {
+      await toggleWishlist(product.id);
+      onRemove(product.id);
+      toast.success("Removed from wishlist");
+    } catch {
+      toast.error("Failed to remove");
+    } finally {
+      setRemoving(false);
+    }
+  };
 
   return (
     <div className="group flex flex-col rounded-2xl border border-border overflow-hidden hover:shadow-md hover:shadow-primary/5 hover:border-primary/20 transition-all">
@@ -110,11 +118,13 @@ function WishlistCard({ product, onRemove }: { product: Product; onRemove: (id: 
           </span>
         </div>
         <button
-          onClick={() => onRemove(product.id)}
-          className="flex items-center justify-center gap-1.5 w-full h-9 rounded-full border border-border text-xs font-medium text-muted-foreground hover:border-destructive/40 hover:text-destructive transition-colors"
+          onClick={handleRemove}
+          disabled={removing}
+          className="flex items-center justify-center gap-1.5 w-full h-9 rounded-full border border-red-300/30 bg-red-500/8 backdrop-blur-xl text-xs font-medium text-red-500/70 hover:border-red-400/50 hover:bg-red-500/15 hover:text-red-500 transition-all duration-200 disabled:opacity-50"
+          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4)' }}
         >
           <Heart className="w-3.5 h-3.5 fill-current" />
-          Remove from wishlist
+          {removing ? "Removing…" : "Remove from wishlist"}
         </button>
       </div>
     </div>
@@ -139,56 +149,35 @@ function SkeletonCard() {
 }
 
 export default function WishlistPage() {
-  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [ids, setIds] = useState<string[]>([]);
 
-  useEffect(() => {
-    const saved = getWishlist();
-    setIds(saved);
-
-    if (saved.length === 0) {
-      setLoading(false);
-      return;
-    }
-
-    // Fetch each product by ID
-    Promise.all(
-      saved.map((id) =>
-        fetch(`/api/products/${id}`)
-          .then((r) => r.ok ? r.json() : null)
-          .then((data) => data?.product ?? null)
-          .catch(() => null),
-      ),
-    )
-      .then((results) => setProducts(results.filter(Boolean) as Product[]))
+  const load = useCallback(() => {
+    setLoading(true);
+    fetch("/api/wishlist")
+      .then((r) => r.json())
+      .then((data) => setProducts(data.items ?? []))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => { load(); }, [load]);
+
   const handleRemove = (productId: string) => {
-    toggleWishlist(productId);
     setProducts((prev) => prev.filter((p) => p.id !== productId));
-    setIds((prev) => prev.filter((id) => id !== productId));
   };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-10">
-        <button
-          onClick={() => router.back()}
-          className="sm:hidden flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </button>
         <Link
           href="/buyer/dashboard"
-          className="hidden sm:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to dashboard
+          <span className="sm:hidden">Back</span>
+          <span className="hidden sm:inline">Back to dashboard</span>
         </Link>
         <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl tracking-tight">Wishlist</h1>
         <div className="mt-5 h-[3px] w-10 rounded-full bg-saffron" />
@@ -202,7 +191,7 @@ export default function WishlistPage() {
 
       {loading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {Array.from({ length: ids.length || 3 }).map((_, i) => <SkeletonCard key={i} />)}
+          {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : products.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

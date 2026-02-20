@@ -2,6 +2,8 @@ import { auth } from "@bisleri/auth";
 import { db } from "@bisleri/db";
 import { product } from "@bisleri/db/schema/products";
 import { order } from "@bisleri/db/schema/orders";
+import { wishlist } from "@bisleri/db/schema/wishlist";
+import { cart } from "@bisleri/db/schema/cart";
 import { eq, and, count, ne } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -39,13 +41,16 @@ export async function GET() {
     }
 
     // buyer
-    const [ordersResult] = await db
-      .select({ count: count() })
-      .from(order)
-      .where(eq(order.buyerId, session.user.id));
+    const [[ordersResult], [wishlistResult], [cartResult]] = await Promise.all([
+      db.select({ count: count() }).from(order).where(eq(order.buyerId, session.user.id)),
+      db.select({ count: count() }).from(wishlist).where(eq(wishlist.userId, session.user.id)),
+      db.select({ count: count() }).from(cart).where(eq(cart.userId, session.user.id)),
+    ]);
 
     return NextResponse.json({
       orders: ordersResult?.count ?? 0,
+      wishlist: wishlistResult?.count ?? 0,
+      cart: cartResult?.count ?? 0,
     });
   } catch (err) {
     console.error("[GET /api/stats]", err);

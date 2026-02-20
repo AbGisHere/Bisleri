@@ -32,11 +32,11 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="h-10 pl-1.5 pr-4 rounded-full bg-muted/50 hover:bg-muted text-sm font-medium flex items-center gap-2.5 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-          <span className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold">
+        <button className="h-10 w-10 sm:w-auto sm:pl-1.5 sm:pr-4 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl text-sm font-medium flex items-center justify-center sm:justify-start sm:gap-2.5 transition-all duration-200 cursor-pointer hover:bg-primary/15 hover:border-primary/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.06)' }}>
+          <span className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">
             {(session.user.name || "U").charAt(0).toUpperCase()}
           </span>
-          <span className="text-foreground/80">{session.user.name || "User"}</span>
+          <span className="hidden sm:block text-foreground/80">{session.user.name || "User"}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

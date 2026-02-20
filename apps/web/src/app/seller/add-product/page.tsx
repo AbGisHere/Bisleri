@@ -203,11 +203,12 @@ export default function AddProductPage() {
                     key={cat}
                     type="button"
                     onClick={() => handleInputChange("category", formData.category === cat ? "" : cat)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                    className={`px-4 py-2 rounded-full text-sm font-medium border backdrop-blur-xl transition-all duration-200 ${
                       formData.category === cat
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border/50 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                        ? "border-primary/40 bg-primary/10 text-primary"
+                        : "border-primary/15 bg-primary/5 text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-foreground"
                     }`}
+                    style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4)' }}
                   >
                     {cat}
                   </button>
@@ -310,13 +311,15 @@ export default function AddProductPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 h-12 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 h-12 rounded-full backdrop-blur-xl bg-primary/90 border border-white/10 text-primary-foreground font-semibold text-sm transition-all duration-200 hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
           >
             {isSubmitting ? "Listing…" : "List Product"}
           </button>
           <Link
             href="/seller/dashboard"
-            className="px-6 h-12 rounded-full border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors flex items-center"
+            className="px-6 h-12 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/15 transition-all duration-200 flex items-center"
+            style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4)' }}
           >
             Cancel
           </Link>
