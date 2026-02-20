@@ -241,7 +241,8 @@ export default function Page() {
           >
             <Link
               href={ctaHref}
-              className="group/btn inline-flex items-center gap-3 mt-8 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-base hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+              className="group/btn inline-flex items-center gap-3 mt-8 px-8 py-3.5 rounded-full backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground font-semibold text-base hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 6px 20px rgba(0,0,0,0.15)' }}
             >
               {session ? "Go to dashboard" : "Start selling"}
               <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
@@ -330,7 +331,8 @@ export default function Page() {
           <div className="mt-10">
             <Link
               href={ctaHref}
-              className="group/cta inline-flex items-center gap-3 px-10 py-4 rounded-full bg-primary-foreground text-primary dark:bg-primary dark:text-primary-foreground font-bold text-lg hover:shadow-xl hover:shadow-black/10 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+              className="group/cta inline-flex items-center gap-3 px-10 py-4 rounded-full backdrop-blur-xl bg-primary-foreground/80 border border-primary/10 text-primary dark:bg-primary/75 dark:border-white/15 dark:text-primary-foreground font-bold text-lg hover:-translate-y-0.5 hover:bg-primary-foreground/90 dark:hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 8px 24px rgba(0,0,0,0.12)' }}
             >
               {session ? "Go to dashboard" : "Join Rangaayan"}
               <ArrowRight className="w-5 h-5 transition-transform group-hover/cta:translate-x-0.5" />

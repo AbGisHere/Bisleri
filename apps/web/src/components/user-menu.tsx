@@ -22,7 +22,8 @@ export default function UserMenu() {
     return (
       <Link
         href="/login"
-        className="h-10 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium flex items-center hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+        className="h-10 px-6 rounded-full backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground text-sm font-medium flex items-center hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
+        style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 14px rgba(0,0,0,0.15)' }}
       >
         Sign In
       </Link>

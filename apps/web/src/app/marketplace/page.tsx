@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Search, MapPin, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 const CATEGORIES = ["All", "Weaving", "Pottery", "Embroidery", "Food", "Jewellery", "Painting", "Basket Weaving", "Tailoring"];
 
@@ -115,7 +115,9 @@ function SkeletonCard() {
 }
 
 export default function MarketplacePage() {
-  const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const role = session?.user?.role;
+  const dashboardHref = role === "buyer" ? "/buyer/dashboard" : role === "seller" ? "/seller/dashboard" : "/";
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -144,13 +146,13 @@ export default function MarketplacePage() {
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-10">
-        <button
-          onClick={() => router.back()}
-          className="sm:hidden flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+        <Link
+          href={dashboardHref}
+          className="sm:hidden inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
-        </button>
+        </Link>
         <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">Browse</p>
         <h1 className="font-display text-5xl sm:text-6xl tracking-tight">Marketplace</h1>
         <div className="mt-5 h-[3px] w-10 rounded-full bg-primary" />
