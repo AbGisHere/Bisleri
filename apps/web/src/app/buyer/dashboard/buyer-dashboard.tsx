@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import {
   Store,
-  ShoppingCart,
   Heart,
   TrendingUp,
   ArrowRight,
 } from "lucide-react";
+import ShoppingCartIcon from "@/components/ui/shopping-cart-icon";
+import ScanHeartIcon from "@/components/ui/scan-heart-icon";
+import ChartLineIcon from "@/components/ui/chart-line-icon";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 
@@ -15,6 +18,9 @@ export default function BuyerDashboard({
 }: {
   session: typeof authClient.$Infer.Session;
 }) {
+  const [isCartHovered, setIsCartHovered] = useState(false);
+  const [isHeartHovered, setIsHeartHovered] = useState(false);
+  const [isChartHovered, setIsChartHovered] = useState(false);
   const firstName = session.user.name.split(" ")[0];
   const hour = new Date().getHours();
   const greeting =
@@ -57,11 +63,12 @@ export default function BuyerDashboard({
         <div className="grid sm:grid-cols-2 gap-4">
           {[
             {
-              icon: ShoppingCart,
+              icon: ShoppingCartIcon,
               title: "My Orders",
               desc: "Track your purchases",
               tag: "0 orders",
               color: "text-terracotta bg-terracotta-light",
+              isCart: true,
             },
             {
               icon: Heart,
@@ -69,6 +76,7 @@ export default function BuyerDashboard({
               desc: "Saved products",
               tag: "0 saved",
               color: "text-clay bg-saffron-light",
+              isHeart: true,
             },
             {
               icon: Store,
@@ -83,17 +91,36 @@ export default function BuyerDashboard({
               desc: "Trends & forecasts",
               tag: "Ready",
               color: "text-forest bg-forest-light",
+              isChart: true,
             },
           ].map((mod) => (
             <Link
               key={mod.title}
               href="#"
               className="group flex items-center gap-4 p-5 rounded-2xl border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all"
+              onMouseEnter={() => {
+                if (mod.isCart) setIsCartHovered(true);
+                if (mod.isHeart) setIsHeartHovered(true);
+                if (mod.isChart) setIsChartHovered(true);
+              }}
+              onMouseLeave={() => {
+                if (mod.isCart) setIsCartHovered(false);
+                if (mod.isHeart) setIsHeartHovered(false);
+                if (mod.isChart) setIsChartHovered(false);
+              }}
             >
               <div
                 className={`w-11 h-11 rounded-xl ${mod.color} flex items-center justify-center shrink-0`}
               >
-                <mod.icon className="w-5 h-5" />
+                {mod.isCart ? (
+                  <ShoppingCartIcon hovered={isCartHovered} className="w-5 h-5" />
+                ) : mod.isHeart ? (
+                  <ScanHeartIcon hovered={isHeartHovered} className="w-5 h-5" />
+                ) : mod.isChart ? (
+                  <ChartLineIcon hovered={isChartHovered} className="w-5 h-5" />
+                ) : (
+                  <mod.icon className="w-5 h-5" />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm">{mod.title}</div>
