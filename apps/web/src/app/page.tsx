@@ -20,7 +20,7 @@ export default function Page() {
           <h1 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.05] font-bold tracking-tight max-w-5xl">
             She makes it.
             <br />
-            <span className="text-primary italic">The world buys it.</span>
+            <span className="text-primary">The world buys it.</span>
           </h1>
 
           <p className="mt-10 sm:mt-14 text-lg sm:text-xl text-muted-foreground max-w-md leading-relaxed">
