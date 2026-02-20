@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, MapPin, Package, User, Tag } from "lucide-react";
+import { ArrowLeft, MapPin, Package, User, Tag, Heart } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { getWishlist, toggleWishlist } from "@/app/buyer/wishlist/page";
 
 interface Product {
   id: string;
@@ -85,6 +86,18 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    if (id) setIsWishlisted(getWishlist().includes(id));
+  }, [id]);
+
+  const handleWishlist = () => {
+    if (!id) return;
+    const added = toggleWishlist(id);
+    setIsWishlisted(added);
+    toast.success(added ? "Added to wishlist" : "Removed from wishlist");
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -254,19 +267,32 @@ export default function ProductDetailPage() {
               This is your listing
             </div>
           ) : (
-            <button
-              onClick={handleOrder}
-              disabled={isOrdering || product.quantity === 0}
-              className="mt-2 h-12 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isOrdering
-                ? "Placing order…"
-                : product.quantity === 0
-                  ? "Out of stock"
-                  : isLoggedIn
-                    ? "Place Order"
-                    : "Sign in to Order"}
-            </button>
+            <div className="flex gap-3 mt-2">
+              <button
+                onClick={handleOrder}
+                disabled={isOrdering || product.quantity === 0}
+                className="flex-1 h-12 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isOrdering
+                  ? "Placing order…"
+                  : product.quantity === 0
+                    ? "Out of stock"
+                    : isLoggedIn
+                      ? "Place Order"
+                      : "Sign in to Order"}
+              </button>
+              <button
+                onClick={handleWishlist}
+                className={`w-12 h-12 rounded-full border flex items-center justify-center transition-colors shrink-0 ${
+                  isWishlisted
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/30 hover:text-primary"
+                }`}
+                title={isWishlisted ? "Remove from wishlist" : "Save to wishlist"}
+              >
+                <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
+              </button>
+            </div>
           )}
         </div>
       </div>
