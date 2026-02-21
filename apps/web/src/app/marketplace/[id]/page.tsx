@@ -10,6 +10,24 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { getWishlistedIds, toggleWishlist } from "@/app/buyer/wishlist/page";
 
+const thankYouMessages = [
+  "She made it for you",
+  "Your cart changed a life",
+  "From her hands to yours",
+  "Real craft. Real impact",
+  "You chose her today",
+  "No middlemen. Just her",
+  "Thank you for seeing her",
+  "Small buy. Big difference",
+  "She'll smile when this ships",
+  "Good hands made this",
+  "You paid her fairly",
+  "Craft over convenience",
+  "She was waiting for you",
+  "Her work. Your choice",
+  "You made her day"
+];
+
 interface Product {
   id: string;
   name: string;
@@ -91,7 +109,14 @@ export default function ProductDetailPage() {
   const [cartQuantity, setCartQuantity] = useState(0);
   const [cartUpdating, setCartUpdating] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [thankYouMessage, setThankYouMessage] = useState("");
   const wishlistIconRef = useRef<AnimatedIconHandle>(null);
+
+  // Set random thank you message when cart quantity changes
+  useEffect(() => {
+    const randomMessage = thankYouMessages[Math.floor(Math.random() * thankYouMessages.length)];
+    setThankYouMessage(randomMessage);
+  }, [cartQuantity]);
 
   useEffect(() => {
     if (!id || !session) return;
@@ -374,14 +399,16 @@ export default function ProductDetailPage() {
                 </button>
               )}
 
-              {/* Thank you note — shown when counter is active */}
+              {/* Thank you note — shown when counter is active, takes more space when wishlist is hidden */}
               {cartQuantity > 0 && (
                 <div
-                  className="flex-1 h-12 rounded-full border border-saffron/40 bg-saffron/10 backdrop-blur-xl flex items-center justify-center gap-1.5 px-3 overflow-hidden"
-                  style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5)' }}
+                  className={`min-w-0 h-12 rounded-full border border-primary/40 bg-primary/10 backdrop-blur-xl flex items-center justify-center gap-1.5 px-4 overflow-hidden ${
+                    cartQuantity > 0 ? "flex-1" : "flex-1"
+                  }`}
+                  style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.06)' }}
                 >
-                  <span className="text-sm">🙏</span>
-                  <span className="text-xs font-medium text-accent-foreground/80 truncate">Thank you for supporting us!</span>
+                  <span className="text-sm flex-shrink-0">🌸</span>
+                  <span className="text-sm font-medium text-primary text-center leading-tight">{thankYouMessage}</span>
                 </div>
               )}
 
@@ -403,30 +430,32 @@ export default function ProductDetailPage() {
                 </button>
               )}
 
-              {/* Wishlist */}
-              <button
-                onClick={handleWishlist}
-                onMouseEnter={() => wishlistIconRef.current?.startAnimation()}
-                onMouseLeave={() => wishlistIconRef.current?.stopAnimation()}
-                title={isWishlisted ? "Remove from wishlist" : "Save to wishlist"}
-                className={`w-12 h-12 rounded-full border flex items-center justify-center shrink-0 backdrop-blur-xl transition-all duration-200 ${
-                  isWishlisted
-                    ? "border-red-400/50 bg-red-500/15 text-red-500 dark:bg-red-500/10 dark:text-red-400"
-                    : "border-border/60 bg-background/40 text-muted-foreground hover:border-red-300/70 hover:bg-red-500/8 hover:text-red-400"
-                }`}
-                style={{
-                  boxShadow: isWishlisted
-                    ? 'inset 0 1px 2px rgba(255,255,255,0.6), 0 2px 8px rgba(239,68,68,0.2)'
-                    : 'inset 0 1px 2px rgba(255,255,255,0.4), 0 1px 4px rgba(0,0,0,0.06)',
-                }}
-              >
-                <ScanHeartIcon
-                  ref={wishlistIconRef}
-                  size={18}
-                  color="currentColor"
-                  strokeWidth={isWishlisted ? 2.5 : 2}
-                />
-              </button>
+              {/* Wishlist - hidden when item is in cart */}
+              {cartQuantity === 0 && (
+                <button
+                  onClick={handleWishlist}
+                  onMouseEnter={() => wishlistIconRef.current?.startAnimation()}
+                  onMouseLeave={() => wishlistIconRef.current?.stopAnimation()}
+                  title={isWishlisted ? "Remove from wishlist" : "Save to wishlist"}
+                  className={`w-12 h-12 rounded-full border flex items-center justify-center shrink-0 backdrop-blur-xl transition-all duration-200 ${
+                    isWishlisted
+                      ? "border-red-400/50 bg-red-500/15 text-red-500 dark:bg-red-500/10 dark:text-red-400"
+                      : "border-border/60 bg-background/40 text-muted-foreground hover:border-red-300/70 hover:bg-red-500/8 hover:text-red-400"
+                  }`}
+                  style={{
+                    boxShadow: isWishlisted
+                      ? 'inset 0 1px 2px rgba(255,255,255,0.6), 0 2px 8px rgba(239,68,68,0.2)'
+                      : 'inset 0 1px 2px rgba(255,255,255,0.4), 0 1px 4px rgba(0,0,0,0.06)',
+                  }}
+                >
+                  <ScanHeartIcon
+                    ref={wishlistIconRef}
+                    size={18}
+                    color="currentColor"
+                    strokeWidth={isWishlisted ? 2.5 : 2}
+                  />
+                </button>
+              )}
             </div>
           )}
         </div>
