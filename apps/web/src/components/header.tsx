@@ -63,16 +63,13 @@ export default function Header() {
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform">
-              <span className="text-primary-foreground font-bold text-sm">R</span>
-            </div>
-            <span className="font-brand text-xl font-semibold tracking-tight">
-              <span className="text-primary">R</span>angaayan
+          <Link href="/" className="flex items-center group">
+            <span className="font-brand text-[1.35rem] font-semibold tracking-[-0.01em] text-foreground">
+              Rangaayan
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1.5">
             {links.map(({ to, label }) => {
               const active =
                 to === "/"
@@ -85,12 +82,12 @@ export default function Header() {
                   className={`px-4 py-2 rounded-full text-sm font-medium backdrop-blur-xl border transition-all duration-200 ${
                     active
                       ? "bg-primary/10 border-primary/20 text-primary"
-                      : "border-transparent text-muted-foreground hover:bg-muted/40 hover:border-border/30 hover:text-foreground"
+                      : "border-transparent text-muted-foreground hover:bg-primary/5 hover:border-primary/10 hover:text-foreground"
                   }`}
                   style={{
                     boxShadow: active
-                      ? 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 4px rgba(0,0,0,0.06)'
-                      : 'inset 0 1px 1px rgba(255,255,255,0.15), 0 1px 2px rgba(0,0,0,0.03)',
+                      ? 'inset 0 1px 1px rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.08)'
+                      : undefined,
                   }}
                 >
                   {label}
@@ -103,11 +100,11 @@ export default function Header() {
             {showCart && (
               <Link
                 href="/buyer/cart"
-                className="relative w-10 h-10 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/30"
+                className="relative w-9 h-9 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/25"
                 title="Cart"
-                style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.06)' }}
+                style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.06)' }}
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-4 h-4 text-foreground/70" />
                 {cartCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
                     {cartCount > 9 ? "9+" : cartCount}
@@ -122,8 +119,8 @@ export default function Header() {
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              className="md:hidden w-10 h-10 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.06)' }}
+              className="md:hidden w-9 h-9 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/25 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.06)' }}
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -151,12 +148,12 @@ export default function Header() {
                   className={`px-4 py-2.5 rounded-xl text-sm font-medium backdrop-blur-xl border transition-all duration-200 ${
                     active
                       ? "bg-primary/10 border-primary/20 text-primary"
-                      : "border-transparent text-muted-foreground hover:bg-muted/40 hover:border-border/30 hover:text-foreground"
+                      : "border-transparent text-muted-foreground hover:bg-primary/5 hover:border-primary/10 hover:text-foreground"
                   }`}
                   style={{
                     boxShadow: active
-                      ? 'inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 4px rgba(0,0,0,0.06)'
-                      : 'inset 0 1px 1px rgba(255,255,255,0.15), 0 1px 2px rgba(0,0,0,0.03)',
+                      ? 'inset 0 1px 1px rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.08)'
+                      : undefined,
                   }}
                 >
                   {label}
