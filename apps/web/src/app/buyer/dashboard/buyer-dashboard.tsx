@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Store, ShoppingBag, Users } from "lucide-react";
+import { Store } from "lucide-react";
 import type { Route } from "next";
 import ShoppingCartIcon from "@/components/ui/shopping-cart-icon";
 import ScanHeartIcon from "@/components/ui/scan-heart-icon";
-import ChartLineIcon from "@/components/ui/chart-line-icon";
 import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
 import type { Session } from "@/lib/types";
@@ -38,35 +37,12 @@ export default function BuyerDashboard({ session }: { session: Session }) {
       href: "/buyer/wishlist",
     },
     {
-      icon: ShoppingBag,
-      title: "Cart",
-      desc: "Items ready to order",
-      tag: stats ? `${stats.cart} item${stats.cart !== 1 ? "s" : ""}` : "…",
-      color: "accent",
-      href: "/buyer/cart",
-    },
-    {
       icon: Store,
       title: "Marketplace",
       desc: "Browse all products",
       tag: "Explore",
       color: "primary",
       href: "/marketplace",
-    },
-    {
-      icon: ChartLineIcon,
-      title: "Demand Insights",
-      desc: "Trends & forecasts",
-      tag: "Ready",
-      color: "accent",
-    },
-    {
-      icon: Users,
-      title: "NGO Connect",
-      desc: "Workshops & skill programs near you",
-      tag: "Explore",
-      color: "primary",
-      href: "/buyer/ngos" as Route,
     },
   ];
 
