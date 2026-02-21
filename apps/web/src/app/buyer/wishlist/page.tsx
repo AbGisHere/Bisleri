@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { ArrowLeft, MapPin, Heart, Store } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useLocale } from "@/lib/i18n";
 
 // Exported so product detail page can use the same toggle logic
 export async function toggleWishlist(productId: string): Promise<boolean> {
@@ -66,6 +67,7 @@ function gradientFor(id: string) {
 
 function WishlistCard({ product, onRemove }: { product: Product; onRemove: (id: string) => void }) {
   const [removing, setRemoving] = useState(false);
+  const { t } = useLocale();
   const level = demandLevel(product.demandScale);
   const demand = DEMAND_STYLES[level];
 
@@ -74,9 +76,9 @@ function WishlistCard({ product, onRemove }: { product: Product; onRemove: (id: 
     try {
       await toggleWishlist(product.id);
       onRemove(product.id);
-      toast.success("Removed from wishlist");
+      toast.success(t("toast.removedFromWishlistAction"));
     } catch {
-      toast.error("Failed to remove");
+      toast.error(t("toast.removeFailed"));
     } finally {
       setRemoving(false);
     }

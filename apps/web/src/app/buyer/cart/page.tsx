@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, Minus, Plus, Trash2, ShoppingCart } from "lucide-rea
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useLocale } from "@/lib/i18n";
 
 interface CartItem {
   cartId: string;
@@ -46,6 +47,7 @@ function CartItemRow({
   onQuantityChange: (id: string, qty: number) => void;
 }) {
   const [updating, setUpdating] = useState(false);
+  const { t } = useLocale();
 
   const changeQty = async (delta: number) => {
     const newQty = item.quantity + delta;
@@ -60,7 +62,7 @@ function CartItemRow({
       if (!res.ok) throw new Error();
       onQuantityChange(item.id, newQty);
     } catch {
-      toast.error("Failed to update quantity");
+      toast.error(t("toast.quantityFailed"));
     } finally {
       setUpdating(false);
     }
@@ -77,7 +79,7 @@ function CartItemRow({
       if (!res.ok) throw new Error();
       onRemove(item.id);
     } catch {
-      toast.error("Failed to remove item");
+      toast.error(t("toast.removeFailed"));
     } finally {
       setUpdating(false);
     }
@@ -169,6 +171,7 @@ function SkeletonRow() {
 
 export default function CartPage() {
   const router = useRouter();
+  const { t } = useLocale();
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState(false);
@@ -206,7 +209,7 @@ export default function CartPage() {
       );
       router.push("/buyer/orders");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Checkout failed");
+      toast.error(err instanceof Error ? err.message : t("toast.checkoutFailed"));
     } finally {
       setCheckingOut(false);
     }

@@ -134,7 +134,7 @@ export default function ProductDetailPage() {
 
   const handleWishlist = async () => {
     if (!session) {
-      toast.error("Sign in to save products");
+      toast.error(t("toast.signInToSave"));
       router.push("/login");
       return;
     }
@@ -143,9 +143,9 @@ export default function ProductDetailPage() {
     try {
       const added = await toggleWishlist(id!);
       setIsWishlisted(added);
-      toast.success(added ? "Added to wishlist" : "Removed from wishlist");
+      toast.success(added ? t("toast.addedToWishlist") : t("toast.removedFromWishlist"));
     } catch {
-      toast.error("Failed to update wishlist");
+      toast.error(t("toast.wishlistFailed"));
     }
   };
 
@@ -165,7 +165,7 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!session) {
-      toast.error("Sign in to add to cart");
+      toast.error(t("toast.signInToCart"));
       router.push("/login");
       return;
     }
@@ -180,7 +180,7 @@ export default function ProductDetailPage() {
       if (!res.ok) throw new Error(data.error ?? "Failed to add to cart");
       setCartQuantity(1);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : t("toast.somethingWrong"));
     } finally {
       setCartUpdating(false);
     }
@@ -208,7 +208,7 @@ export default function ProductDetailPage() {
         setCartQuantity(newQty);
       }
     } catch {
-      toast.error("Failed to update cart");
+      toast.error(t("toast.cartFailed"));
     } finally {
       setCartUpdating(false);
     }
@@ -216,12 +216,12 @@ export default function ProductDetailPage() {
 
   const handleOrder = async () => {
     if (!session) {
-      toast.error("Sign in to place an order");
+      toast.error(t("toast.signInToOrder"));
       router.push("/login");
       return;
     }
     if (session.user.role === "seller" && product?.sellerId === session.user.id) {
-      toast.error("You cannot order your own product");
+      toast.error(t("toast.cantOrderOwn"));
       return;
     }
     setIsOrdering(true);
@@ -237,10 +237,10 @@ export default function ProductDetailPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to place order");
-      toast.success("Order placed!");
+      toast.success(t("toast.orderPlaced"));
       router.push("/buyer/dashboard");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : t("toast.somethingWrong"));
     } finally {
       setIsOrdering(false);
     }

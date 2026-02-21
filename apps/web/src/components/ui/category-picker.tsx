@@ -1,4 +1,18 @@
+"use client";
+
 import { CATEGORIES } from "@/lib/constants";
+import { useLocale } from "@/lib/i18n";
+
+const CATEGORY_I18N: Record<string, string> = {
+  Weaving: "category.weaving",
+  Pottery: "category.pottery",
+  Embroidery: "category.embroidery",
+  Food: "category.food",
+  Jewellery: "category.jewellery",
+  Painting: "category.painting",
+  "Basket Weaving": "category.basketWeaving",
+  Tailoring: "category.tailoring",
+};
 
 interface CategoryPickerProps {
   value: string;
@@ -7,6 +21,7 @@ interface CategoryPickerProps {
 }
 
 export function CategoryPicker({ value, onChange, size = "md" }: CategoryPickerProps) {
+  const { t } = useLocale();
   const sizeClasses = size === "sm"
     ? "px-3 py-1.5 text-xs"
     : "px-4 py-2 text-sm";
@@ -25,7 +40,7 @@ export function CategoryPicker({ value, onChange, size = "md" }: CategoryPickerP
           }`}
           style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.4)" }}
         >
-          {cat}
+          {t(CATEGORY_I18N[cat] ?? cat)}
         </button>
       ))}
     </div>
