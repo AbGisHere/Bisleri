@@ -120,11 +120,16 @@ export default function BuyerOrdersPage() {
     .filter((o) => o.status === "delivered")
     .reduce((sum, o) => sum + parseFloat(o.totalAmount), 0);
 
+  // Calculate loyalty points: ₹100 spent = 100 points
+  const totalPoints = Math.floor(totalSpend); // Every ₹1 = 1 point
+  const redeemableValue = Math.floor(totalPoints / 20); // Every 20 points = ₹1 discount
+  const remainingPoints = totalPoints % 20; // Points that can't be redeemed yet
+
   const STATS = [
     { label: "Total", value: orders.length.toString(), sub: "orders placed" },
-    { label: "Active", value: active.length.toString(), sub: "in progress" },
+    { label: "In Transit", value: active.length.toString(), sub: "in progress" },
     { label: "Delivered", value: completed.filter(o => o.status === "delivered").length.toString(), sub: "received" },
-    { label: "Spent", value: `₹${totalSpend.toLocaleString("en-IN")}`, sub: "total" },
+    { label: "Points", value: totalPoints.toLocaleString("en-IN"), sub: `₹${redeemableValue} discount available` },
   ];
 
   return (
@@ -162,11 +167,43 @@ export default function BuyerOrdersPage() {
         ))}
       </div>
 
+      {/* Points Breakdown */}
+      {!loading && totalPoints > 0 && (
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 mb-12">
+          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <span className="text-2xl">🌟</span>
+            Your Loyalty Points
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-background rounded-xl border border-border">
+              <p className="text-2xl font-bold text-primary">{totalPoints.toLocaleString("en-IN")}</p>
+              <p className="text-sm text-muted-foreground">Total Points Earned</p>
+              <p className="text-xs text-muted-foreground mt-1">From ₹{totalSpend.toLocaleString("en-IN")} spent</p>
+            </div>
+            <div className="text-center p-4 bg-background rounded-xl border border-border">
+              <p className="text-2xl font-bold text-terracotta">{redeemableValue}</p>
+              <p className="text-sm text-muted-foreground">Available Discount</p>
+              <p className="text-xs text-muted-foreground mt-1">₹{redeemableValue} off next order</p>
+            </div>
+            <div className="text-center p-4 bg-background rounded-xl border border-border">
+              <p className="text-2xl font-bold text-saffron">{remainingPoints}</p>
+              <p className="text-sm text-muted-foreground">Points Needed</p>
+              <p className="text-xs text-muted-foreground mt-1">{20 - remainingPoints} more for ₹1 discount</p>
+            </div>
+          </div>
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <p className="text-xs text-muted-foreground text-center">
+              💡 <strong>How it works:</strong> ₹100 spent = 100 points • 20 points = ₹1 discount • Points are earned on delivered orders
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Active orders */}
       <div className="mb-10">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
-            Active Orders
+            In Transit
           </h2>
           {!loading && <span className="text-xs text-muted-foreground">{active.length} orders</span>}
         </div>
