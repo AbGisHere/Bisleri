@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Plus, Users, TrendingUp, Search } from "lucide-react";
-import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
-import ChartLineIcon from "@/components/ui/chart-line-icon";
 import TruckElectricIcon from "@/components/ui/truck-electric-icon";
 import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
 import type { Route } from "next";
@@ -59,26 +57,10 @@ export default function SellerDashboard({ session }: { session: Session }) {
     {
       icon: ScanBarcodeIcon,
       title: "Marketplace",
-      desc: "Products, orders, payouts",
-      tag: stats ? `${stats.products} listed` : "…",
+      desc: "Research products & pricing",
+      tag: "Explore",
       color: "primary",
       href: "/marketplace",
-    },
-    {
-      icon: BrainCircuitIcon,
-      title: "AI Pricing",
-      desc: "Smart price suggestions",
-      tag: "Ready",
-      color: "primary",
-      href: "/seller/ai-pricing",
-    },
-    {
-      icon: ChartLineIcon,
-      title: "Demand Insights",
-      desc: "Trends & forecasts",
-      tag: "Ready",
-      color: "primary",
-      href: "/seller/demand-insights",
     },
     {
       icon: TruckElectricIcon,
