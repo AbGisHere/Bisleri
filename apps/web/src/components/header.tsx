@@ -11,11 +11,13 @@ import { ModeToggle } from "./mode-toggle";
 import { LanguageToggle } from "./language-toggle";
 import UserMenu from "./user-menu";
 import { useLocale } from "@/lib/i18n";
+import { useTheme } from "next-themes";
 
 export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session } = authClient.useSession();
+  const { theme } = useTheme();
   const mobileNavRef = useRef<HTMLElement>(null);
   const { t } = useLocale();
 
@@ -68,7 +70,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform">
-              <img src="/rangaayan-logo.jpg" alt="Rangaayan" className="w-full h-full object-cover" />
+              <img
+                src={theme === "dark" ? "/rangaayan-logo-dark.svg" : "/rangaayan-logo-light.svg"}
+                alt="Rangaayan"
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="text-xl font-semibold tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
               <span className="text-primary">R</span>angaayan
