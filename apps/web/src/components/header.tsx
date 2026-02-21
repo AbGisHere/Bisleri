@@ -63,18 +63,12 @@ export default function Header() {
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-<<<<<<< HEAD
-          <Link href="/" className="flex items-center group">
-            <span className="font-brand text-[1.35rem] font-semibold tracking-[-0.01em] text-foreground">
-              Rangaayan
-=======
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform">
               <img src="/rangaayan-logo.jpg" alt="Rangaayan" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-semibold tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
               <span className="text-primary">R</span>angaayan
->>>>>>> c010dfe276652e030c70d222dd7d97a579f6111f
             </span>
           </Link>
 
