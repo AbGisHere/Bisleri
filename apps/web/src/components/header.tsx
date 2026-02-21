@@ -141,9 +141,8 @@ export default function Header() {
             {session && (
               <Link
                 href="/messages"
-                className="relative w-9 h-9 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/25"
+                className="relative w-9 h-9 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/25 shadow-glass-sm"
                 title={t("chat.messages")}
-                style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.06)' }}
               >
                 <MessageCircle className="w-4 h-4 text-foreground/70" />
                 {unreadMessages > 0 && (

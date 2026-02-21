@@ -137,3 +137,24 @@
   }
 }
 
+@layer utilities {
+  .shadow-glass-sm {
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .shadow-glass {
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .shadow-glass-lg {
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .shadow-glass-xl {
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 8px 24px rgba(0,0,0,0.15);
+  }
+  .shadow-glass-button {
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 3px 10px rgba(0,0,0,0.12);
+  }
+  .shadow-glass-cta {
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 6px 20px rgba(0,0,0,0.15);
+  }
+}
+

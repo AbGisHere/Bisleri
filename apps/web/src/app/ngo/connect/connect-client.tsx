@@ -147,7 +147,7 @@ export default function ConnectClient({ session: _session }: { session: Session 
                       )}
                       <Link
                         href={`/messages/${seller.userId}` as Route}
-                        className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+                        className="inline-flex items-center gap-1.5 mt-2.5 px-3.5 py-1.5 rounded-lg backdrop-blur-xl bg-primary/10 border border-primary/15 text-primary text-xs font-medium hover:bg-primary/20 hover:border-primary/25 transition-all shadow-glass-sm"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
                         Message

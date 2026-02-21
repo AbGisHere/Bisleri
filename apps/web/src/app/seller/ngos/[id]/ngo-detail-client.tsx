@@ -217,8 +217,7 @@ export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
 
         <Link
           href={`/messages/${ngoId}` as Route}
-          className="inline-flex items-center gap-2 mt-5 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:translate-y-px transition-all"
-          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 3px 10px rgba(0,0,0,0.12)' }}
+          className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-xl bg-primary/80 border border-white/15 text-primary-foreground text-sm font-medium hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200 shadow-glass-button"
         >
           <MessageCircle className="w-4 h-4" />
           Message
