@@ -78,15 +78,16 @@ export default function DashboardLayout({
 
       <Link
         href={cta.href}
-        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl bg-primary text-primary-foreground dark:bg-primary/20 dark:text-foreground dark:border dark:border-primary/30 mb-10 hover:opacity-95 transition-opacity"
+        className="group flex items-center justify-between p-6 sm:p-8 rounded-3xl backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground mb-10 hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
+        style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 8px 24px rgba(0,0,0,0.15)' }}
       >
         <div className="flex items-center gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-primary-foreground/15 dark:bg-primary/15 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-primary-foreground/15 flex items-center justify-center">
             <cta.icon className="w-7 h-7" />
           </div>
           <div>
             <div className="text-xl font-semibold">{cta.title}</div>
-            <div className="text-primary-foreground/80 dark:text-muted-foreground text-sm mt-0.5">
+            <div className="text-primary-foreground/70 text-sm mt-0.5">
               {cta.desc}
             </div>
           </div>
@@ -103,7 +104,8 @@ export default function DashboardLayout({
             <Link
               key={mod.title}
               href={(mod.href ?? "#") as Route}
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-sm transition-all"
+              className="group flex items-center gap-4 p-5 rounded-2xl backdrop-blur-xl bg-background/40 border border-border/60 hover:border-primary/30 hover:-translate-y-0.5 hover:bg-background/60 active:translate-y-0 transition-all duration-200"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.06)' }}
               onMouseEnter={() => handleMouseEnter(mod.title)}
               onMouseLeave={() => handleMouseLeave(mod.title)}
             >

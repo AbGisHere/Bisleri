@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
 import ChartLineIcon from "@/components/ui/chart-line-icon";
 import TruckElectricIcon from "@/components/ui/truck-electric-icon";
@@ -53,6 +53,14 @@ export default function SellerDashboard({ session }: { session: Session }) {
       tag: stats ? `${stats.activeOrders} active` : "…",
       color: "primary",
       href: "/seller/logistics",
+    },
+    {
+      icon: Users,
+      title: "NGO Connect",
+      desc: "Browse workshops & skill programs",
+      tag: "Explore",
+      color: "accent",
+      href: "/seller/ngos" as Route,
     },
   ];
 

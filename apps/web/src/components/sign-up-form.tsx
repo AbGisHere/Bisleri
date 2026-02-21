@@ -145,7 +145,8 @@ export default function SignUpForm({
             <Button
               type="submit"
               disabled={!state.canSubmit || state.isSubmitting}
-              className="w-full h-12 rounded-xl text-base hover:opacity-90 transition-opacity"
+              className="w-full h-12 rounded-xl text-base backdrop-blur-xl bg-primary/80 border border-white/15 hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200 disabled:translate-y-0"
+              style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
             >
               {state.isSubmitting ? "Creating account..." : "Create Account"}
             </Button>
