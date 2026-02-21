@@ -11,6 +11,7 @@ import BrainCircuitIcon from "@/components/ui/brain-circuit-icon";
 import ChartLineIcon from "@/components/ui/chart-line-icon";
 import TruckElectricIcon from "@/components/ui/truck-electric-icon";
 import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
+import { useLocale } from "@/lib/i18n";
 
 export interface WorkspaceItem {
   icon: LucideIcon | ((props: { className?: string }) => ReactNode);
@@ -45,10 +46,11 @@ export default function DashboardLayout({
   emptyActivityMessage,
   children,
 }: DashboardLayoutProps) {
+  const { t } = useLocale();
   const firstName = (session.user.name || "there").split(" ")[0];
   const hour = new Date().getHours();
   const greeting =
-    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    hour < 12 ? t("greeting.morning") : hour < 17 ? t("greeting.afternoon") : t("greeting.evening");
 
   const iconRefs = useRef<{ [key: string]: any }>({});
 
@@ -99,7 +101,7 @@ export default function DashboardLayout({
 
       <div className="mb-10">
         <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
-          Your Workspace
+          {t("dashboard.workspace")}
         </h2>
         <div className="grid sm:grid-cols-2 gap-4">
           {workspaceItems.map((mod) => (
@@ -119,36 +121,36 @@ export default function DashboardLayout({
                 }`}
               >
                 {mod.icon === BrainCircuitIcon ? (
-                  <BrainCircuitIcon 
+                  <BrainCircuitIcon
                     ref={(ref) => {
                       if (ref) iconRefs.current[mod.title] = ref;
                     }}
-                    size={20} 
-                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                    size={20}
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"}
                   />
                 ) : mod.icon === ChartLineIcon ? (
-                  <ChartLineIcon 
+                  <ChartLineIcon
                     ref={(ref) => {
                       if (ref) iconRefs.current[mod.title] = ref;
                     }}
-                    size={20} 
-                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                    size={20}
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"}
                   />
                 ) : mod.icon === TruckElectricIcon ? (
-                  <TruckElectricIcon 
+                  <TruckElectricIcon
                     ref={(ref) => {
                       if (ref) iconRefs.current[mod.title] = ref;
                     }}
-                    size={20} 
-                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                    size={20}
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"}
                   />
                 ) : mod.icon === ScanBarcodeIcon ? (
-                  <ScanBarcodeIcon 
+                  <ScanBarcodeIcon
                     ref={(ref) => {
                       if (ref) iconRefs.current[mod.title] = ref;
                     }}
-                    size={20} 
-                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"} 
+                    size={20}
+                    className={mod.color === "primary" ? "text-primary" : "text-accent-foreground"}
                   />
                 ) : (
                   <mod.icon className="w-5 h-5" />
@@ -170,14 +172,14 @@ export default function DashboardLayout({
 
       <div>
         <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
-          Recent Activity
+          {t("dashboard.recentActivity")}
         </h2>
         <div className="rounded-2xl border border-border bg-muted/20 px-6 py-14 flex flex-col items-center gap-3 text-center">
           <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
             <Clock className="w-4 h-4 text-muted-foreground/60" />
           </div>
           <div>
-            <p className="font-medium text-sm text-foreground">Nothing here yet</p>
+            <p className="font-medium text-sm text-foreground">{t("dashboard.nothingYet")}</p>
             <p className="text-sm text-muted-foreground mt-1 max-w-xs">
               {emptyActivityMessage}
             </p>

@@ -10,6 +10,7 @@ import Loader from "./loader";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { useLocale } from "@/lib/i18n";
 
 export default function SignUpForm({
   onSwitchToSignIn,
@@ -18,6 +19,7 @@ export default function SignUpForm({
 }) {
   const router = useRouter();
   const { isPending } = authClient.useSession();
+  const { t } = useLocale();
 
   const form = useForm({
     defaultValues: { name: "", email: "", password: "" },
@@ -27,7 +29,7 @@ export default function SignUpForm({
         {
           onSuccess: () => {
             router.push("/onboarding");
-            toast.success("Account created!");
+            toast.success(t("toast.accountCreated"));
           },
           onError: (error) => {
             toast.error(error.error.message || error.error.statusText);
@@ -49,10 +51,10 @@ export default function SignUpForm({
   return (
     <div>
       <h1 className="font-display text-3xl font-bold mb-2">
-        Create your account
+        {t("auth.createYourAccount")}
       </h1>
       <p className="text-muted-foreground mb-10">
-        Start selling your products to the world.
+        {t("auth.startSelling")}
       </p>
 
       <form
@@ -74,10 +76,10 @@ export default function SignUpForm({
         >
           {(field) => (
             <div className="space-y-2.5">
-              <Label htmlFor={field.name}>Full Name</Label>
+              <Label htmlFor={field.name}>{t("auth.fullName")}</Label>
               <Input
                 id={field.name}
-                placeholder="Your name"
+                placeholder={t("auth.namePlaceholder")}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => {
@@ -99,11 +101,11 @@ export default function SignUpForm({
         <form.Field name="email">
           {(field) => (
             <div className="space-y-2.5">
-              <Label htmlFor={field.name}>Email</Label>
+              <Label htmlFor={field.name}>{t("auth.email")}</Label>
               <Input
                 id={field.name}
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("auth.emailPlaceholder")}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
@@ -121,11 +123,11 @@ export default function SignUpForm({
         <form.Field name="password">
           {(field) => (
             <div className="space-y-2.5">
-              <Label htmlFor={field.name}>Password</Label>
+              <Label htmlFor={field.name}>{t("auth.password")}</Label>
               <Input
                 id={field.name}
                 type="password"
-                placeholder="Min 8 characters"
+                placeholder={t("auth.passwordPlaceholder")}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
@@ -148,19 +150,19 @@ export default function SignUpForm({
               className="w-full h-12 rounded-xl text-base backdrop-blur-xl bg-primary/80 border border-white/15 hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200 disabled:translate-y-0"
               style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
             >
-              {state.isSubmitting ? "Creating account..." : "Create Account"}
+              {state.isSubmitting ? t("auth.creatingAccount") : t("auth.createAccount")}
             </Button>
           )}
         </form.Subscribe>
       </form>
 
       <p className="mt-8 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t("auth.haveAccount")}{" "}
         <button
           onClick={onSwitchToSignIn}
           className="text-primary font-medium hover:underline"
         >
-          Sign in
+          {t("auth.signIn")}
         </button>
       </p>
     </div>

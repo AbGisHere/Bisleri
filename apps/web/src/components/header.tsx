@@ -8,13 +8,16 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { ModeToggle } from "./mode-toggle";
+import { LanguageToggle } from "./language-toggle";
 import UserMenu from "./user-menu";
+import { useLocale } from "@/lib/i18n";
 
 export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session } = authClient.useSession();
   const mobileNavRef = useRef<HTMLElement>(null);
+  const { t } = useLocale();
 
   const closeMobileMenu = useCallback(() => setMobileOpen(false), []);
 
@@ -55,8 +58,8 @@ export default function Header() {
           : "/seller/dashboard";
 
   const links: { to: Route; label: string }[] = [
-    { to: "/" as Route, label: "Home" },
-    { to: dashboardHref as Route, label: "Dashboard" },
+    { to: "/" as Route, label: t("nav.home") },
+    { to: dashboardHref as Route, label: t("nav.dashboard") },
   ];
 
   return (
@@ -80,7 +83,7 @@ export default function Header() {
                   : pathname.startsWith(to);
               return (
                 <Link
-                  key={label}
+                  key={to}
                   href={to}
                   className={`px-4 py-2 rounded-full text-sm font-medium backdrop-blur-xl border transition-all duration-200 ${
                     active
@@ -115,6 +118,7 @@ export default function Header() {
                 )}
               </Link>
             )}
+            <LanguageToggle />
             <ModeToggle />
             <UserMenu />
             <button
@@ -145,7 +149,7 @@ export default function Header() {
                   : pathname.startsWith(to);
               return (
                 <Link
-                  key={label}
+                  key={to}
                   href={to}
                   onClick={closeMobileMenu}
                   className={`px-4 py-2.5 rounded-xl text-sm font-medium backdrop-blur-xl border transition-all duration-200 ${

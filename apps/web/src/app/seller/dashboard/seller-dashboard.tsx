@@ -19,8 +19,10 @@ import {
   getDemandLabel,
   getMeterColor,
 } from "@/lib/parse-ai";
+import { useLocale } from "@/lib/i18n";
 
 export default function SellerDashboard({ session }: { session: Session }) {
+  const { t } = useLocale();
   const [stats, setStats] = useState<{ products: number; activeOrders: number } | null>(null);
   const [demandProduct, setDemandProduct] = useState("");
   const [demandCategory, setDemandCategory] = useState("");
@@ -56,25 +58,25 @@ export default function SellerDashboard({ session }: { session: Session }) {
   const workspaceItems: WorkspaceItem[] = [
     {
       icon: ScanBarcodeIcon,
-      title: "Marketplace",
-      desc: "Research products & pricing",
-      tag: "Explore",
+      title: t("seller.marketplace"),
+      desc: t("seller.marketplaceDesc"),
+      tag: t("seller.explore"),
       color: "primary",
       href: "/marketplace",
     },
     {
       icon: TruckElectricIcon,
-      title: "Logistics",
-      desc: "Shipping & delivery",
-      tag: stats ? `${stats.activeOrders} active` : "…",
+      title: t("seller.logistics"),
+      desc: t("seller.logisticsDesc"),
+      tag: stats ? `${stats.activeOrders} ${t("seller.active")}` : "…",
       color: "primary",
       href: "/seller/logistics",
     },
     {
       icon: Users,
-      title: "NGO Connect",
-      desc: "Browse workshops & skill programs",
-      tag: "Explore",
+      title: t("seller.ngoConnect"),
+      desc: t("seller.ngoConnectDesc"),
+      tag: t("seller.explore"),
       color: "accent",
       href: "/seller/ngos" as Route,
     },
@@ -86,16 +88,16 @@ export default function SellerDashboard({ session }: { session: Session }) {
       accentColor="bg-terracotta"
       cta={{
         icon: Plus,
-        title: "List a new product",
-        desc: "Upload a photo and let AI do the rest",
+        title: t("seller.listProduct"),
+        desc: t("seller.listProductDesc"),
         href: "/seller/add-product" as Route,
       }}
       workspaceItems={workspaceItems}
-      emptyActivityMessage="No activity yet. List your first product to get started."
+      emptyActivityMessage={t("seller.emptyActivity")}
     >
       <div className="mb-10">
         <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
-          Quick Demand Check
+          {t("seller.quickDemand")}
         </h2>
         <div
           className="rounded-2xl border border-border backdrop-blur-xl bg-background/40 p-6 space-y-5"
@@ -103,7 +105,7 @@ export default function SellerDashboard({ session }: { session: Session }) {
         >
           <div className="flex flex-col sm:flex-row gap-3">
             <Input
-              placeholder="Product name, e.g. Handwoven silk saree"
+              placeholder={t("seller.demandPlaceholder")}
               value={demandProduct}
               onChange={(e) => setDemandProduct(e.target.value)}
               onKeyDown={(e) => {
@@ -122,7 +124,7 @@ export default function SellerDashboard({ session }: { session: Session }) {
               ) : (
                 <Search className="w-3.5 h-3.5" />
               )}
-              {stream.isLoading ? stream.status || "Analyzing…" : "Analyze"}
+              {stream.isLoading ? stream.status || t("seller.analyzing") : t("seller.analyze")}
             </button>
           </div>
 
@@ -132,7 +134,7 @@ export default function SellerDashboard({ session }: { session: Session }) {
             <div className="space-y-4 pt-1">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <TrendingUp className="h-4 w-4" />
-                <span>Demand Analysis</span>
+                <span>{t("seller.demandAnalysis")}</span>
               </div>
 
               <div className="relative">

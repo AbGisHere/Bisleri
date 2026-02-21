@@ -13,62 +13,37 @@ import {
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
-const ROLES = [
-  {
-    value: "buyer",
-    label: "Buy Products",
-    desc: "Discover handmade goods from rural artisans",
-    icon: ShoppingBag,
-  },
-  {
-    value: "seller",
-    label: "Sell My Work",
-    desc: "List your products and reach more customers",
-    icon: Store,
-  },
-  {
-    value: "ngo",
-    label: "NGO / Non-Profit",
-    desc: "Run workshops and connect women artisans",
-    icon: Building2,
-  },
-];
+import { useLocale } from "@/lib/i18n";
 
 const SKILL_OPTIONS = [
-  "Weaving",
-  "Pottery",
-  "Embroidery",
-  "Food Processing",
-  "Tailoring",
-  "Jewellery",
-  "Painting",
-  "Candle Making",
-  "Basket Weaving",
-  "Block Printing",
+  { value: "Weaving", key: "skill.weaving" },
+  { value: "Pottery", key: "skill.pottery" },
+  { value: "Embroidery", key: "skill.embroidery" },
+  { value: "Food Processing", key: "skill.foodProcessing" },
+  { value: "Tailoring", key: "skill.tailoring" },
+  { value: "Jewellery", key: "skill.jewellery" },
+  { value: "Painting", key: "skill.painting" },
+  { value: "Candle Making", key: "skill.candleMaking" },
+  { value: "Basket Weaving", key: "skill.basketWeaving" },
+  { value: "Block Printing", key: "skill.blockPrinting" },
 ];
 
 const INTEREST_OPTIONS = [
-  "Handloom & Textiles",
-  "Pottery & Ceramics",
-  "Embroidered Goods",
-  "Organic Food",
-  "Handmade Jewellery",
-  "Home Decor",
-  "Traditional Art",
-  "Natural Beauty",
-  "Leather Craft",
-  "Eco-Friendly Products",
+  { value: "Handloom & Textiles", key: "interest.handloomTextiles" },
+  { value: "Pottery & Ceramics", key: "interest.potteryCeramics" },
+  { value: "Embroidered Goods", key: "interest.embroideredGoods" },
+  { value: "Organic Food", key: "interest.organicFood" },
+  { value: "Handmade Jewellery", key: "interest.handmadeJewellery" },
+  { value: "Home Decor", key: "interest.homeDecor" },
+  { value: "Traditional Art", key: "interest.traditionalArt" },
+  { value: "Natural Beauty", key: "interest.naturalBeauty" },
+  { value: "Leather Craft", key: "interest.leatherCraft" },
+  { value: "Eco-Friendly Products", key: "interest.ecoFriendly" },
 ];
-
-function getStepLabels(role: string) {
-  if (role === "buyer") return ["Choose your role", "About you", "Your interests"];
-  if (role === "ngo") return ["Choose your role", "About you", "Your organisation"];
-  return ["Choose your role", "About you", "Your skills"];
-}
 
 export default function Onboarding({ userName }: { userName: string }) {
   const router = useRouter();
+  const { t } = useLocale();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -84,6 +59,34 @@ export default function Onboarding({ userName }: { userName: string }) {
   const [womenServed, setWomenServed] = useState("");
 
   const firstName = (userName || "there").split(" ")[0];
+
+  const ROLES = [
+    {
+      value: "buyer",
+      label: t("onboarding.buyProducts"),
+      desc: t("onboarding.buyProductsDesc"),
+      icon: ShoppingBag,
+    },
+    {
+      value: "seller",
+      label: t("onboarding.sellMyWork"),
+      desc: t("onboarding.sellMyWorkDesc"),
+      icon: Store,
+    },
+    {
+      value: "ngo",
+      label: t("onboarding.ngoNonProfit"),
+      desc: t("onboarding.ngoNonProfitDesc"),
+      icon: Building2,
+    },
+  ];
+
+  function getStepLabels(r: string) {
+    if (r === "buyer") return [t("onboarding.chooseRole"), t("onboarding.aboutYou"), t("onboarding.yourInterests")];
+    if (r === "ngo") return [t("onboarding.chooseRole"), t("onboarding.aboutYou"), t("onboarding.yourOrganisation")];
+    return [t("onboarding.chooseRole"), t("onboarding.aboutYou"), t("onboarding.yourSkills")];
+  }
+
   const stepLabels = getStepLabels(role);
 
   const ageNum = Number(age);
@@ -135,10 +138,10 @@ export default function Onboarding({ userName }: { userName: string }) {
 
       if (!res.ok) throw new Error("Failed to save profile");
 
-      toast.success(skipAll ? "Welcome! You can update your profile anytime." : "You\u2019re all set!");
+      toast.success(skipAll ? t("toast.welcomeSkip") : t("toast.allSet"));
       router.push("/dashboard");
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("toast.somethingWrong"));
     } finally {
       setSubmitting(false);
     }
@@ -150,7 +153,7 @@ export default function Onboarding({ userName }: { userName: string }) {
       if (!canContinue) return;
     }
     if (step === 2 && role === "ngo") {
-      setTouched((t) => ({ ...t, ngoName: true, focusArea: true }));
+      setTouched((prev) => ({ ...prev, ngoName: true, focusArea: true }));
       if (!canContinue) return;
     }
     if (step < 2) {
@@ -189,14 +192,14 @@ export default function Onboarding({ userName }: { userName: string }) {
         {step === 0 && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
-              Welcome, {firstName}!
+              {t("onboarding.welcome")} {firstName}!
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">
-              What brings you here?
+              {t("onboarding.whatBringsYou")}
             </p>
 
             <fieldset>
-              <legend className="sr-only">Select your role</legend>
+              <legend className="sr-only">{t("onboarding.chooseRole")}</legend>
               <div className="space-y-3" role="radiogroup">
                 {ROLES.map((r) => (
                   <button
@@ -243,25 +246,25 @@ export default function Onboarding({ userName }: { userName: string }) {
         {step === 1 && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
-              Tell us about you
+              {t("onboarding.tellUsAboutYou")}
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">
-              This helps us personalise your experience.
+              {t("onboarding.personaliseDesc")}
             </p>
 
             <div className="space-y-5">
               <div className="space-y-2.5">
-                <Label htmlFor="age">Your age</Label>
+                <Label htmlFor="age">{t("onboarding.yourAge")}</Label>
                 <Input
                   id="age"
                   type="number"
                   inputMode="numeric"
                   min={13}
                   max={120}
-                  placeholder="e.g. 28"
+                  placeholder={t("onboarding.agePlaceholder")}
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, age: true }))}
+                  onBlur={() => setTouched((prev) => ({ ...prev, age: true }))}
                   aria-required="true"
                   aria-invalid={ageError ? true : undefined}
                   aria-describedby={ageError ? "age-error" : undefined}
@@ -275,16 +278,16 @@ export default function Onboarding({ userName }: { userName: string }) {
               </div>
 
               <div className="space-y-2.5">
-                <Label htmlFor="location">Where are you from?</Label>
+                <Label htmlFor="location">{t("onboarding.whereFrom")}</Label>
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" aria-hidden="true" />
                   <Input
                     id="location"
                     type="text"
-                    placeholder="Village, District, or State"
+                    placeholder={t("onboarding.locationPlaceholder")}
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    onBlur={() => setTouched((t) => ({ ...t, location: true }))}
+                    onBlur={() => setTouched((prev) => ({ ...prev, location: true }))}
                     aria-required="true"
                     aria-invalid={locationError ? true : undefined}
                     aria-describedby={locationError ? "location-error" : undefined}
@@ -304,23 +307,23 @@ export default function Onboarding({ userName }: { userName: string }) {
         {step === 2 && role === "seller" && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
-              What do you make?
+              {t("onboarding.whatDoYouMake")}
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">
-              Pick all that apply — you can always change this later.
+              {t("onboarding.pickAll")}
             </p>
 
-            <div className="flex flex-wrap gap-2.5" role="group" aria-label="Select your skills">
-              {SKILL_OPTIONS.map((skill) => {
-                const selected = skills.includes(skill);
+            <div className="flex flex-wrap gap-2.5" role="group" aria-label={t("onboarding.yourSkills")}>
+              {SKILL_OPTIONS.map((opt) => {
+                const selected = skills.includes(opt.value);
                 return (
                   <button
-                    key={skill}
+                    key={opt.value}
                     onClick={() =>
                       setSkills(
                         selected
-                          ? skills.filter((s) => s !== skill)
-                          : [...skills, skill],
+                          ? skills.filter((s) => s !== opt.value)
+                          : [...skills, opt.value],
                       )
                     }
                     aria-pressed={selected}
@@ -335,14 +338,14 @@ export default function Onboarding({ userName }: { userName: string }) {
                         : "border-white/15 bg-background/30 hover:bg-primary/10 hover:border-primary/30 text-foreground"
                     }`}
                   >
-                    {skill}
+                    {t(opt.key)}
                   </button>
                 );
               })}
             </div>
 
             <p className="text-xs text-muted-foreground mt-4">
-              This step is optional — skip if none apply.
+              {t("onboarding.optionalSkip")}
             </p>
           </div>
         )}
@@ -350,23 +353,23 @@ export default function Onboarding({ userName }: { userName: string }) {
         {step === 2 && role === "buyer" && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
-              What interests you?
+              {t("onboarding.whatInterestsYou")}
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">
-              We&apos;ll show you relevant products and artisans.
+              {t("onboarding.showRelevant")}
             </p>
 
-            <div className="flex flex-wrap gap-2.5" role="group" aria-label="Select your interests">
-              {INTEREST_OPTIONS.map((interest) => {
-                const selected = interests.includes(interest);
+            <div className="flex flex-wrap gap-2.5" role="group" aria-label={t("onboarding.yourInterests")}>
+              {INTEREST_OPTIONS.map((opt) => {
+                const selected = interests.includes(opt.value);
                 return (
                   <button
-                    key={interest}
+                    key={opt.value}
                     onClick={() =>
                       setInterests(
                         selected
-                          ? interests.filter((i) => i !== interest)
-                          : [...interests, interest],
+                          ? interests.filter((i) => i !== opt.value)
+                          : [...interests, opt.value],
                       )
                     }
                     aria-pressed={selected}
@@ -381,14 +384,14 @@ export default function Onboarding({ userName }: { userName: string }) {
                         : "border-white/15 bg-background/30 hover:bg-primary/10 hover:border-primary/30 text-foreground"
                     }`}
                   >
-                    {interest}
+                    {t(opt.key)}
                   </button>
                 );
               })}
             </div>
 
             <p className="text-xs text-muted-foreground mt-4">
-              This step is optional — skip if none apply.
+              {t("onboarding.optionalSkip")}
             </p>
           </div>
         )}
@@ -396,22 +399,22 @@ export default function Onboarding({ userName }: { userName: string }) {
         {step === 2 && role === "ngo" && (
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
-              Your organisation
+              {t("onboarding.organisationTitle")}
             </h1>
             <p className="text-muted-foreground mb-8 text-lg">
-              Tell us about your NGO so we can connect you with the right artisans.
+              {t("onboarding.organisationDesc")}
             </p>
 
             <div className="space-y-5">
               <div className="space-y-2.5">
-                <Label htmlFor="ngoName">Organisation name</Label>
+                <Label htmlFor="ngoName">{t("onboarding.orgName")}</Label>
                 <Input
                   id="ngoName"
                   type="text"
-                  placeholder="e.g. Disha Foundation"
+                  placeholder={t("onboarding.orgNamePlaceholder")}
                   value={ngoName}
                   onChange={(e) => setNgoName(e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, ngoName: true }))}
+                  onBlur={() => setTouched((prev) => ({ ...prev, ngoName: true }))}
                   aria-required="true"
                   aria-invalid={ngoNameError ? true : undefined}
                   aria-describedby={ngoNameError ? "ngoName-error" : undefined}
@@ -425,24 +428,24 @@ export default function Onboarding({ userName }: { userName: string }) {
               </div>
 
               <div className="space-y-2.5">
-                <Label>Focus areas</Label>
+                <Label>{t("onboarding.focusAreas")}</Label>
                 <div
                   className="flex flex-wrap gap-2.5"
                   role="group"
-                  aria-label="Select focus areas"
-                  onBlur={() => setTouched((t) => ({ ...t, focusArea: true }))}
+                  aria-label={t("onboarding.focusAreas")}
+                  onBlur={() => setTouched((prev) => ({ ...prev, focusArea: true }))}
                 >
-                  {SKILL_OPTIONS.map((skill) => {
-                    const selected = focusArea.includes(skill);
+                  {SKILL_OPTIONS.map((opt) => {
+                    const selected = focusArea.includes(opt.value);
                     return (
                       <button
-                        key={skill}
+                        key={opt.value}
                         type="button"
                         onClick={() =>
                           setFocusArea(
                             selected
-                              ? focusArea.filter((s) => s !== skill)
-                              : [...focusArea, skill],
+                              ? focusArea.filter((s) => s !== opt.value)
+                              : [...focusArea, opt.value],
                           )
                         }
                         aria-pressed={selected}
@@ -457,7 +460,7 @@ export default function Onboarding({ userName }: { userName: string }) {
                             : "border-white/15 bg-background/30 hover:bg-primary/10 hover:border-primary/30 text-foreground"
                         }`}
                       >
-                        {skill}
+                        {t(opt.key)}
                       </button>
                     );
                   })}
@@ -470,11 +473,11 @@ export default function Onboarding({ userName }: { userName: string }) {
               </div>
 
               <div className="space-y-2.5">
-                <Label htmlFor="districtCoverage">Districts covered <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Label htmlFor="districtCoverage">{t("onboarding.districtsCovered")} <span className="text-muted-foreground font-normal">({t("onboarding.optional")})</span></Label>
                 <Input
                   id="districtCoverage"
                   type="text"
-                  placeholder="e.g. Pune, Nashik, Aurangabad"
+                  placeholder={t("onboarding.districtsPlaceholder")}
                   value={districtCoverage}
                   onChange={(e) => setDistrictCoverage(e.target.value)}
                   className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
@@ -482,13 +485,13 @@ export default function Onboarding({ userName }: { userName: string }) {
               </div>
 
               <div className="space-y-2.5">
-                <Label htmlFor="womenServed">Women served <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Label htmlFor="womenServed">{t("onboarding.womenServed")} <span className="text-muted-foreground font-normal">({t("onboarding.optional")})</span></Label>
                 <Input
                   id="womenServed"
                   type="number"
                   inputMode="numeric"
                   min={1}
-                  placeholder="e.g. 200"
+                  placeholder={t("onboarding.womenServedPlaceholder")}
                   value={womenServed}
                   onChange={(e) => setWomenServed(e.target.value)}
                   className="h-14 rounded-2xl px-5 text-lg bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50"
@@ -505,10 +508,10 @@ export default function Onboarding({ userName }: { userName: string }) {
           className="mt-10 w-full h-14 rounded-2xl backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground text-base font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {submitting
-            ? "Saving..."
+            ? t("onboarding.saving")
             : step === 2
-              ? "Get Started"
-              : "Continue"}
+              ? t("onboarding.getStarted")
+              : t("onboarding.continue")}
           {!submitting && <ArrowRight className="w-4 h-4" aria-hidden="true" />}
         </button>
 
@@ -517,7 +520,7 @@ export default function Onboarding({ userName }: { userName: string }) {
             onClick={() => setStep(step - 1)}
             className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg py-1"
           >
-            Go back
+            {t("onboarding.goBack")}
           </button>
         )}
 
@@ -526,7 +529,7 @@ export default function Onboarding({ userName }: { userName: string }) {
           disabled={submitting}
           className="mt-3 w-full text-center text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors py-1 disabled:opacity-40"
         >
-          Skip for now — I&apos;ll explore on my own
+          {t("onboarding.skipForNow")}
         </button>
       </div>
     </div>

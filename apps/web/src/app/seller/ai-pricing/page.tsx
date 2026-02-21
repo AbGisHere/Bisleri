@@ -10,8 +10,10 @@ import { CategoryPicker } from "@/components/ui/category-picker";
 import { PageHeader } from "@/components/ui/page-header";
 import { useAiStream } from "@/lib/use-ai-stream";
 import { cleanAiLines, extractPrice } from "@/lib/parse-ai";
+import { useLocale } from "@/lib/i18n";
 
 export default function AIPricingPage() {
+  const { t } = useLocale();
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
@@ -21,7 +23,7 @@ export default function AIPricingPage() {
 
   const handleAnalyze = async () => {
     if (!productName) {
-      toast.error("Enter a product name");
+      toast.error(t("toast.enterProductName"));
       return;
     }
     setAnalysisLines([]);
@@ -41,7 +43,7 @@ export default function AIPricingPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-3xl mx-auto">
-      <PageHeader title="AI Pricing" />
+      <PageHeader title={t("pricing.title")} />
 
       {/* Form card */}
       <div
@@ -52,12 +54,12 @@ export default function AIPricingPage() {
           {/* Product name + location row */}
           <div className="grid sm:grid-cols-[1fr_auto] gap-4">
             <div className="space-y-2">
-              <Label htmlFor="product" className="text-sm font-medium">Product name</Label>
+              <Label htmlFor="product" className="text-sm font-medium">{t("pricing.productName")}</Label>
               <div className="relative">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                 <Input
                   id="product"
-                  placeholder="e.g., Handwoven Cotton Basket"
+                  placeholder={t("pricing.productPlaceholder")}
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
                   onKeyDown={(e) => {
@@ -68,12 +70,12 @@ export default function AIPricingPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location" className="text-sm font-medium">Location</Label>
+              <Label htmlFor="location" className="text-sm font-medium">{t("pricing.location")}</Label>
               <div className="relative">
                 <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                 <Input
                   id="location"
-                  placeholder="State or district"
+                  placeholder={t("pricing.locationPlaceholder")}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="h-12 rounded-xl pl-10 pr-4 bg-muted/40 border-border/40 focus-visible:bg-background focus-visible:border-border placeholder:text-muted-foreground/50 sm:w-48"
@@ -84,7 +86,7 @@ export default function AIPricingPage() {
 
           {/* Category */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Category</Label>
+            <Label className="text-sm font-medium">{t("pricing.category")}</Label>
             <CategoryPicker value={category} onChange={setCategory} size="sm" />
           </div>
 
@@ -100,7 +102,7 @@ export default function AIPricingPage() {
             ) : (
               <Sparkles className="w-3.5 h-3.5" />
             )}
-            {stream.isLoading ? (stream.status || "Analyzing…") : "Analyze Pricing"}
+            {stream.isLoading ? (stream.status || t("pricing.analyzing")) : t("pricing.analyzePricing")}
           </button>
         </div>
       </div>
@@ -112,7 +114,7 @@ export default function AIPricingPage() {
           style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.06)" }}
         >
           <LoadingIcon size={24} className="text-primary" />
-          <p className="text-sm text-muted-foreground">{stream.status || "Analyzing…"}</p>
+          <p className="text-sm text-muted-foreground">{stream.status || t("pricing.analyzing")}</p>
         </div>
       )}
 
@@ -128,7 +130,7 @@ export default function AIPricingPage() {
               <div className="flex items-center gap-2 mb-3">
                 <IndianRupee className="h-4 w-4 text-muted-foreground" />
                 <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
-                  Suggested Price
+                  {t("pricing.suggestedPrice")}
                 </span>
               </div>
               <p className="font-display text-5xl sm:text-6xl tracking-tight text-primary">{suggestedPrice}</p>
@@ -142,7 +144,7 @@ export default function AIPricingPage() {
               style={{ boxShadow: "inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.06)" }}
             >
               <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-4">
-                Market Analysis
+                {t("pricing.marketAnalysis")}
               </p>
               <div className="space-y-2.5">
                 {analysisLines.map((line, i) => (

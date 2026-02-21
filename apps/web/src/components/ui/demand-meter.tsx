@@ -5,6 +5,7 @@ import { TrendingUp } from "lucide-react";
 import { LoadingIcon } from "./loading-icon";
 import { toast } from "sonner";
 import { useAiStream } from "@/lib/use-ai-stream";
+import { useLocale } from "@/lib/i18n";
 import {
   cleanAiLines,
   extractDemandScore,
@@ -19,13 +20,14 @@ interface DemandMeterProps {
 }
 
 export function DemandMeter({ productName, onDemandChange }: DemandMeterProps) {
+  const { t } = useLocale();
   const [demandScore, setDemandScore] = useState(0);
   const [insightLines, setInsightLines] = useState<string[]>([]);
   const stream = useAiStream("/api/ai/demand");
 
   const analyzeDemand = useCallback(async () => {
     if (!productName) {
-      toast.error("Enter a product name first");
+      toast.error(t("toast.enterProductNameFirst"));
       return;
     }
 
@@ -40,14 +42,14 @@ export function DemandMeter({ productName, onDemandChange }: DemandMeterProps) {
       setInsightLines(cleanAiLines(result).slice(0, 6));
       onDemandChange?.(score);
     }
-  }, [productName, stream, onDemandChange]);
+  }, [productName, stream, onDemandChange, t]);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
-          <span className="text-sm font-medium">Demand Analysis</span>
+          <span className="text-sm font-medium">{t("seller.demandAnalysis")}</span>
         </div>
         <button
           type="button"
@@ -56,7 +58,7 @@ export function DemandMeter({ productName, onDemandChange }: DemandMeterProps) {
           className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40"
         >
           {stream.isLoading && <LoadingIcon size={12} className="text-terracotta dark:text-foreground" />}
-          {stream.isLoading ? stream.status || "Analyzing..." : demandScore > 0 ? "Re-analyze" : "Analyze"}
+          {stream.isLoading ? stream.status || t("seller.analyzing") : t("seller.analyze")}
         </button>
       </div>
 

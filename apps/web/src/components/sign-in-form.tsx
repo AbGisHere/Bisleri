@@ -10,6 +10,7 @@ import Loader from "./loader";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { useLocale } from "@/lib/i18n";
 
 export default function SignInForm({
   onSwitchToSignUp,
@@ -18,6 +19,7 @@ export default function SignInForm({
 }) {
   const router = useRouter();
   const { isPending } = authClient.useSession();
+  const { t } = useLocale();
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
@@ -27,7 +29,7 @@ export default function SignInForm({
         {
           onSuccess: () => {
             router.push("/dashboard");
-            toast.success("Welcome back!");
+            toast.success(t("toast.welcomeBack"));
           },
           onError: (error) => {
             toast.error(error.error.message || error.error.statusText);
@@ -48,10 +50,10 @@ export default function SignInForm({
   return (
     <div>
       <h1 className="font-display text-3xl font-bold mb-2">
-        Welcome back
+        {t("auth.welcomeBack")}
       </h1>
       <p className="text-muted-foreground mb-10">
-        Sign in to manage your listings and orders.
+        {t("auth.signInDesc")}
       </p>
 
       <form
@@ -64,11 +66,11 @@ export default function SignInForm({
         <form.Field name="email">
           {(field) => (
             <div className="space-y-2.5">
-              <Label htmlFor={field.name}>Email</Label>
+              <Label htmlFor={field.name}>{t("auth.email")}</Label>
               <Input
                 id={field.name}
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("auth.emailPlaceholder")}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
@@ -86,11 +88,11 @@ export default function SignInForm({
         <form.Field name="password">
           {(field) => (
             <div className="space-y-2.5">
-              <Label htmlFor={field.name}>Password</Label>
+              <Label htmlFor={field.name}>{t("auth.password")}</Label>
               <Input
                 id={field.name}
                 type="password"
-                placeholder="Min 8 characters"
+                placeholder={t("auth.passwordPlaceholder")}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
@@ -113,19 +115,19 @@ export default function SignInForm({
               className="w-full h-12 rounded-xl text-base backdrop-blur-xl bg-primary/80 border border-white/15 hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200 disabled:translate-y-0"
               style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
             >
-              {state.isSubmitting ? "Signing in..." : "Sign In"}
+              {state.isSubmitting ? t("auth.signingIn") : t("auth.signIn")}
             </Button>
           )}
         </form.Subscribe>
       </form>
 
       <p className="mt-8 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        {t("auth.noAccount")}{" "}
         <button
           onClick={onSwitchToSignUp}
           className="text-primary font-medium hover:underline"
         >
-          Sign up
+          {t("auth.signUp")}
         </button>
       </p>
     </div>

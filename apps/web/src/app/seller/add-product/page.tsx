@@ -17,9 +17,11 @@ import { LoadingIcon } from "@/components/ui/loading-icon";
 import CameraIcon from "@/components/ui/camera-icon";
 import { useAiStream } from "@/lib/use-ai-stream";
 import { extractPrice } from "@/lib/parse-ai";
+import { useLocale } from "@/lib/i18n";
 
 export default function AddProductPage() {
   const router = useRouter();
+  const { t } = useLocale();
   const [formData, setFormData] = useState({
     imagePreview: "",
     name: "",
@@ -43,7 +45,7 @@ export default function AddProductPage() {
 
   const handleGenerateDescription = async () => {
     if (!formData.name) {
-      toast.error("Enter a product name first");
+      toast.error(t("toast.enterProductNameFirst"));
       return;
     }
     setIsGenerating(true);
@@ -63,9 +65,9 @@ export default function AddProductPage() {
         description: data.description,
         ...(data.suggested_category && !prev.category ? { category: data.suggested_category } : {}),
       }));
-      toast.success("Description generated");
+      toast.success(t("toast.descriptionGenerated"));
     } catch {
-      toast.error("Could not generate description. Is the AI server running?");
+      toast.error(t("toast.descriptionFailed"));
     } finally {
       setIsGenerating(false);
     }
@@ -73,7 +75,7 @@ export default function AddProductPage() {
 
   const handleSuggestPrice = async () => {
     if (!formData.name) {
-      toast.error("Enter a product name first");
+      toast.error(t("toast.enterProductNameFirst"));
       return;
     }
     const result = await priceStream.run({
@@ -85,9 +87,9 @@ export default function AddProductPage() {
       const price = extractPrice(result);
       if (price) {
         setFormData(prev => ({ ...prev, price }));
-        toast.success("Price suggested based on market analysis");
+        toast.success(t("toast.priceSuggested"));
       } else {
-        toast.info("AI analyzed the market but couldn't extract a specific price.");
+        toast.info(t("toast.priceNoExtract"));
       }
     }
   };
@@ -110,7 +112,7 @@ export default function AddProductPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!formData.name || !formData.price || !formData.quantity || !formData.location) {
-      toast.error("Please fill in all required fields.");
+      toast.error(t("toast.fillRequired"));
       return;
     }
     setIsSubmitting(true);
@@ -133,10 +135,10 @@ export default function AddProductPage() {
         const data = await res.json();
         throw new Error(data.error ?? "Failed to list product");
       }
-      toast.success("Product listed!");
+      toast.success(t("toast.productListed"));
       router.push("/marketplace");
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : t("toast.somethingWrong"));
     } finally {
       setIsSubmitting(false);
     }
@@ -144,7 +146,7 @@ export default function AddProductPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-10 max-w-2xl mx-auto">
-      <PageHeader title="New Listing" />
+      <PageHeader title={t("addProduct.title")} />
 
       <form onSubmit={handleSubmit} noValidate className="space-y-12">
 
@@ -167,7 +169,7 @@ export default function AddProductPage() {
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
-                  <span className="text-white text-sm font-medium">Change photo</span>
+                  <span className="text-white text-sm font-medium">{t("addProduct.changePhoto")}</span>
                 </div>
               </div>
             ) : (
@@ -176,8 +178,8 @@ export default function AddProductPage() {
                   <CameraIcon className="w-6 h-6 text-primary" />
                 </div>
                 <div className="text-center">
-                  <p className="text-sm font-medium">Upload a photo</p>
-                  <p className="text-xs text-muted-foreground mt-1">Click to browse · JPG, PNG, WEBP</p>
+                  <p className="text-sm font-medium">{t("addProduct.uploadPhoto")}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t("addProduct.uploadHint")}</p>
                 </div>
               </div>
             )}
@@ -187,14 +189,14 @@ export default function AddProductPage() {
         {/* Details */}
         <div>
           <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-6">
-            Details
+            {t("addProduct.details")}
           </h2>
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium">Product name</Label>
+              <Label htmlFor="name" className="text-sm font-medium">{t("addProduct.productName")}</Label>
               <Input
                 id="name"
-                placeholder="e.g., Handwoven Cotton Basket"
+                placeholder={t("addProduct.productPlaceholder")}
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 required
@@ -204,7 +206,7 @@ export default function AddProductPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+                <Label htmlFor="description" className="text-sm font-medium">{t("addProduct.description")}</Label>
                 <button
                   type="button"
                   disabled={isGenerating}
@@ -218,12 +220,12 @@ export default function AddProductPage() {
                   ) : (
                     <SparklesIcon ref={descSparkleRef} size={13} plain className="text-primary" />
                   )}
-                  {isGenerating ? "Generating…" : "AI generate"}
+                  {isGenerating ? t("addProduct.generating") : t("addProduct.aiGenerate")}
                 </button>
               </div>
               <Textarea
                 id="description"
-                placeholder="Describe your product — materials, size, and what makes it special."
+                placeholder={t("addProduct.descPlaceholder")}
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
                 rows={4}
@@ -232,7 +234,7 @@ export default function AddProductPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Category</Label>
+              <Label className="text-sm font-medium">{t("addProduct.category")}</Label>
               <CategoryPicker
                 value={formData.category}
                 onChange={(cat) => handleInputChange("category", cat)}
@@ -244,12 +246,12 @@ export default function AddProductPage() {
         {/* Pricing & Stock */}
         <div>
           <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-6">
-            Pricing &amp; Stock
+            {t("addProduct.pricingStock")}
           </h2>
           <div className="grid grid-cols-2 gap-4 items-end">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="price" className="text-sm font-medium">Price</Label>
+                <Label htmlFor="price" className="text-sm font-medium">{t("addProduct.price")}</Label>
                 <button
                   type="button"
                   disabled={priceStream.isLoading}
@@ -263,7 +265,7 @@ export default function AddProductPage() {
                   ) : (
                     <SparklesIcon ref={priceSparkleRef} size={13} plain className="text-primary" />
                   )}
-                  {priceStream.isLoading ? (priceStream.status || "Analyzing…") : "Suggest"}
+                  {priceStream.isLoading ? (priceStream.status || t("pricing.analyzing")) : t("addProduct.suggest")}
                 </button>
               </div>
               <Input
@@ -280,7 +282,7 @@ export default function AddProductPage() {
             <div className="space-y-2">
               <Label htmlFor="quantity" className="text-sm font-medium flex items-center gap-1.5">
                 <Package className="w-3.5 h-3.5 text-muted-foreground" />
-                Quantity
+                {t("addProduct.quantity")}
               </Label>
               <Input
                 id="quantity"
@@ -299,15 +301,15 @@ export default function AddProductPage() {
         {/* Location */}
         <div>
           <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-6">
-            Location
+            {t("addProduct.locationSection")}
           </h2>
           <div className="space-y-2">
-            <Label htmlFor="location" className="text-sm font-medium">Where is this product?</Label>
+            <Label htmlFor="location" className="text-sm font-medium">{t("addProduct.whereProduct")}</Label>
             <div className="relative">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
               <Input
                 id="location"
-                placeholder="Village, District, or State"
+                placeholder={t("addProduct.locationPlaceholder")}
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
                 required
@@ -320,7 +322,7 @@ export default function AddProductPage() {
         {/* Demand */}
         <div>
           <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-6">
-            Demand Forecast
+            {t("addProduct.demandForecast")}
           </h2>
           <DemandMeter
             productName={formData.name}
@@ -336,14 +338,14 @@ export default function AddProductPage() {
             className="flex-1 h-12 rounded-full backdrop-blur-xl bg-primary/90 border border-white/10 text-primary-foreground font-semibold text-sm transition-all duration-200 hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.12)' }}
           >
-            {isSubmitting ? "Listing…" : "List Product"}
+            {isSubmitting ? t("addProduct.listing") : t("addProduct.listProduct")}
           </button>
           <Link
             href="/seller/dashboard"
             className="px-6 h-12 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/15 transition-all duration-200 flex items-center"
             style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.4)' }}
           >
-            Cancel
+            {t("addProduct.cancel")}
           </Link>
         </div>
 

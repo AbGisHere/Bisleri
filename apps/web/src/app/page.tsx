@@ -12,41 +12,7 @@ import TruckElectricIcon from "@/components/ui/truck-electric-icon";
 import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
-
-const FEATURES = [
-  {
-    icon: ScanBarcodeIcon,
-    title: "Micromarketplace",
-    desc: "Upload a photo, AI writes the description, suggests a price, and shows demand. List in minutes, not hours.",
-  },
-  {
-    icon: TruckElectricIcon,
-    title: "Logistics",
-    desc: "Village-to-doorstep delivery. Track every package, manage returns, handle payouts \u2014 all in one place.",
-  },
-  {
-    icon: Users,
-    title: "SHG Skills Network",
-    desc: "Find SHGs near you. Apply for training. Get workshop schedules and a one-point contact to your group.",
-  },
-  {
-    icon: BrainCircuitIcon,
-    title: "AI Pricing",
-    desc: "Machine learning analyzes market trends, competitor pricing, and regional demand to suggest optimal prices.",
-  },
-  {
-    icon: ChartLineIcon,
-    title: "Demand Prediction",
-    desc: "Know what\u2019s trending before others. Seasonal forecasts and regional heatmaps for smarter decisions.",
-  },
-];
-
-const STEPS = [
-  { n: "01", title: "Sign Up", desc: "Name, location, skills. Done." },
-  { n: "02", title: "Choose Path", desc: "Learn through SHGs or sell directly." },
-  { n: "03", title: "List Products", desc: "Photo in, AI does the rest." },
-  { n: "04", title: "Earn & Grow", desc: "Orders flow in, payouts go out." },
-];
+import { useLocale } from "@/lib/i18n";
 
 function WovenThread({ className }: { className?: string }) {
   return (
@@ -178,6 +144,7 @@ function StepItem({
 export default function Page() {
   const featuresRef = useRef<HTMLDivElement>(null);
   const featuresInView = useInView(featuresRef, { once: true, margin: "-80px" });
+  const { t } = useLocale();
 
   const { data: session } = authClient.useSession();
   const role = session?.user?.role || "seller";
@@ -188,6 +155,41 @@ export default function Page() {
       : role === "ngo"
         ? "/ngo/dashboard"
         : "/seller/dashboard";
+
+  const FEATURES = [
+    {
+      icon: ScanBarcodeIcon,
+      title: t("home.feature.micromarketplace"),
+      desc: t("home.feature.micromarketplaceDesc"),
+    },
+    {
+      icon: TruckElectricIcon,
+      title: t("home.feature.logistics"),
+      desc: t("home.feature.logisticsDesc"),
+    },
+    {
+      icon: Users,
+      title: t("home.feature.shgNetwork"),
+      desc: t("home.feature.shgNetworkDesc"),
+    },
+    {
+      icon: BrainCircuitIcon,
+      title: t("home.feature.aiPricing"),
+      desc: t("home.feature.aiPricingDesc"),
+    },
+    {
+      icon: ChartLineIcon,
+      title: t("home.feature.demandPrediction"),
+      desc: t("home.feature.demandPredictionDesc"),
+    },
+  ];
+
+  const STEPS = [
+    { n: "01", title: t("home.step1.title"), desc: t("home.step1.desc") },
+    { n: "02", title: t("home.step2.title"), desc: t("home.step2.desc") },
+    { n: "03", title: t("home.step3.title"), desc: t("home.step3.desc") },
+    { n: "04", title: t("home.step4.title"), desc: t("home.step4.desc") },
+  ];
 
   return (
     <>
@@ -210,7 +212,7 @@ export default function Page() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-sm font-medium tracking-[0.2em] uppercase text-primary/70 mb-8"
           >
-            Rural Women&apos;s Marketplace
+            {t("home.subtitle")}
           </motion.p>
 
           <motion.h1
@@ -219,9 +221,9 @@ export default function Page() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.05] font-bold tracking-tight max-w-5xl"
           >
-            She makes it.
+            {t("home.heroLine1")}
             <br />
-            <span className="text-primary">The world buys it.</span>
+            <span className="text-primary">{t("home.heroLine2")}</span>
           </motion.h1>
 
           <motion.p
@@ -230,8 +232,7 @@ export default function Page() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="mt-10 sm:mt-14 text-lg sm:text-xl text-muted-foreground max-w-md leading-relaxed"
           >
-            List products, connect with SHGs, and let AI handle pricing
-            and demand — so you can focus on what you do best.
+            {t("home.heroDesc")}
           </motion.p>
 
           <motion.div
@@ -244,7 +245,7 @@ export default function Page() {
               className="group/btn inline-flex items-center gap-3 mt-8 px-8 py-3.5 rounded-full backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground font-semibold text-base hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
               style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 6px 20px rgba(0,0,0,0.15)' }}
             >
-              {session ? "Go to dashboard" : "Start selling"}
+              {session ? t("home.goToDashboard") : t("home.startSelling")}
               <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
             </Link>
           </motion.div>
@@ -254,9 +255,9 @@ export default function Page() {
       <section className="border-y border-border py-4">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-muted-foreground">
           {[
-            "12 states across India",
-            "AI-powered pricing",
-            "Village-to-doorstep delivery",
+            t("home.stat1"),
+            t("home.stat2"),
+            t("home.stat3"),
           ].map((stat) => (
             <span key={stat} className="flex items-center gap-2.5 whitespace-nowrap">
               <span className="w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
@@ -275,7 +276,7 @@ export default function Page() {
               transition={{ duration: 0.5 }}
               className="font-display text-3xl sm:text-4xl font-bold"
             >
-              Built around five pillars
+              {t("home.featuresTitle")}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 12 }}
@@ -283,14 +284,13 @@ export default function Page() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="mt-4 text-muted-foreground max-w-lg mx-auto"
             >
-              Everything a rural woman entrepreneur needs, from her first listing
-              to scaling a real business.
+              {t("home.featuresDesc")}
             </motion.p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((item, i) => (
-              <FeatureCard key={item.title} index={i} {...item} />
+              <FeatureCard key={i} index={i} {...item} />
             ))}
           </div>
         </div>
@@ -300,10 +300,10 @@ export default function Page() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-16">
             <h2 className="font-display text-3xl sm:text-4xl font-bold">
-              Four steps. That&apos;s it.
+              {t("home.stepsTitle")}
             </h2>
             <p className="text-muted-foreground max-w-sm">
-              From sign-up to your first sale, the entire journey is guided.
+              {t("home.stepsDesc")}
             </p>
           </div>
 
@@ -324,9 +324,9 @@ export default function Page() {
 
         <div className="max-w-4xl mx-auto text-center relative">
           <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-            Your hands create.
+            {t("home.ctaLine1")}
             <br />
-            We handle the rest.
+            {t("home.ctaLine2")}
           </h2>
           <div className="mt-10">
             <Link
@@ -334,7 +334,7 @@ export default function Page() {
               className="group/cta inline-flex items-center gap-3 px-10 py-4 rounded-full backdrop-blur-xl bg-primary-foreground/80 border border-primary/10 text-primary dark:bg-primary/75 dark:border-white/15 dark:text-primary-foreground font-bold text-lg hover:-translate-y-0.5 hover:bg-primary-foreground/90 dark:hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
               style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 8px 24px rgba(0,0,0,0.12)' }}
             >
-              {session ? "Go to dashboard" : "Join Rangaayan"}
+              {session ? t("home.goToDashboard") : t("home.joinRangaayan")}
               <ArrowRight className="w-5 h-5 transition-transform group-hover/cta:translate-x-0.5" />
             </Link>
           </div>

@@ -3,6 +3,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/lib/i18n";
 
 interface PageHeaderProps {
   title: string;
@@ -10,8 +11,11 @@ interface PageHeaderProps {
   backLabel?: string;
 }
 
-export function PageHeader({ title, backHref = "/seller/dashboard" as const, backLabel = "Back to dashboard" }: PageHeaderProps) {
+export function PageHeader({ title, backHref = "/seller/dashboard" as const, backLabel }: PageHeaderProps) {
   const router = useRouter();
+  const { t } = useLocale();
+
+  const resolvedBackLabel = backLabel ?? t("pageHeader.backToDashboard");
 
   return (
     <div className="mb-10">
@@ -20,14 +24,14 @@ export function PageHeader({ title, backHref = "/seller/dashboard" as const, bac
         className="sm:hidden flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back
+        {t("pageHeader.back")}
       </button>
       <Link
         href={backHref}
         className="hidden sm:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
-        {backLabel}
+        {resolvedBackLabel}
       </Link>
       <h1 className="font-display text-5xl sm:text-6xl tracking-tight">{title}</h1>
       <div className="mt-5 h-[3px] w-10 rounded-full bg-terracotta" />

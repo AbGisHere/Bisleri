@@ -9,10 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
+import { useLocale } from "@/lib/i18n";
 
 export default function UserMenu() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
+  const { t } = useLocale();
 
   if (isPending) {
     return <div className="h-10 w-24 rounded-full bg-muted/50 animate-pulse" />;
@@ -25,7 +27,7 @@ export default function UserMenu() {
         className="h-10 px-6 rounded-full backdrop-blur-xl bg-primary/80 border border-white/15 text-primary-foreground text-sm font-medium flex items-center hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 transition-all duration-200"
         style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 4px 14px rgba(0,0,0,0.15)' }}
       >
-        Sign In
+        {t("auth.signIn")}
       </Link>
     );
   }
@@ -67,7 +69,7 @@ export default function UserMenu() {
           }}
           className="w-full text-left text-sm text-destructive px-3 py-2.5 rounded-xl hover:bg-destructive/10 transition-colors cursor-pointer"
         >
-          Sign Out
+          {t("auth.signOut")}
         </button>
       </DropdownMenuContent>
     </DropdownMenu>

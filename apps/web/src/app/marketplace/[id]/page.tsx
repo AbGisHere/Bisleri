@@ -9,6 +9,7 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { getWishlistedIds, toggleWishlist } from "@/app/buyer/wishlist/page";
+import { useLocale } from "@/lib/i18n";
 
 const thankYouMessages = [
   "She made it for you",

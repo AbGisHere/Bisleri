@@ -37,6 +37,13 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${jakarta.variable} ${dmSerif.variable} ${playfair.variable}`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var l=localStorage.getItem("rangaayan-locale");if(l)document.documentElement.lang=l}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="antialiased">
         <Providers>
           <div className="min-h-svh flex flex-col">

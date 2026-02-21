@@ -4,8 +4,21 @@ import { useState, useEffect } from "react";
 import { Search, MapPin, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { useLocale } from "@/lib/i18n";
 
-const CATEGORIES = ["All", "Weaving", "Pottery", "Embroidery", "Food", "Jewellery", "Painting", "Basket Weaving", "Tailoring"];
+const CATEGORY_KEYS = ["All", "Weaving", "Pottery", "Embroidery", "Food", "Jewellery", "Painting", "Basket Weaving", "Tailoring"] as const;
+
+const CATEGORY_I18N: Record<string, string> = {
+  All: "marketplace.all",
+  Weaving: "category.weaving",
+  Pottery: "category.pottery",
+  Embroidery: "category.embroidery",
+  Food: "category.food",
+  Jewellery: "category.jewellery",
+  Painting: "category.painting",
+  "Basket Weaving": "category.basketWeaving",
+  Tailoring: "category.tailoring",
+};
 
 interface Product {
   id: string;
@@ -22,13 +35,7 @@ interface Product {
   createdAt: string;
 }
 
-const DEMAND_STYLES = {
-  high: { label: "High demand", className: "bg-forest/10 text-forest dark:bg-forest/20 dark:text-forest" },
-  medium: { label: "Trending", className: "bg-saffron/20 text-accent-foreground dark:bg-saffron/15 dark:text-saffron" },
-  low: { label: "Low demand", className: "bg-muted text-muted-foreground" },
-};
-
-function demandLevel(score: number | null): keyof typeof DEMAND_STYLES {
+function demandLevel(score: number | null): "high" | "medium" | "low" {
   if (!score) return "low";
   if (score >= 70) return "high";
   if (score >= 40) return "medium";
@@ -53,8 +60,13 @@ function gradientFor(id: string) {
   return GRADIENTS[Math.abs(hash) % GRADIENTS.length];
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, t }: { product: Product; t: (key: string) => string }) {
   const level = demandLevel(product.demandScale);
+  const DEMAND_STYLES = {
+    high: { label: t("marketplace.highDemand"), className: "bg-forest/10 text-forest dark:bg-forest/20 dark:text-forest" },
+    medium: { label: t("marketplace.trending"), className: "bg-saffron/20 text-accent-foreground dark:bg-saffron/15 dark:text-saffron" },
+    low: { label: t("marketplace.lowDemand"), className: "bg-muted text-muted-foreground" },
+  };
   const demand = DEMAND_STYLES[level];
   return (
     <Link
@@ -116,6 +128,7 @@ function SkeletonCard() {
 
 export default function MarketplacePage() {
   const { data: session } = authClient.useSession();
+  const { t } = useLocale();
   const role = session?.user?.role;
   const dashboardHref = role === "buyer" ? "/buyer/dashboard" : role === "seller" ? "/seller/dashboard" : "/";
   const [products, setProducts] = useState<Product[]>([]);
@@ -151,10 +164,10 @@ export default function MarketplacePage() {
           className="sm:hidden inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          {t("marketplace.back")}
         </Link>
-        <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">Browse</p>
-        <h1 className="font-display text-5xl sm:text-6xl tracking-tight">Marketplace</h1>
+        <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">{t("marketplace.browse")}</p>
+        <h1 className="font-display text-5xl sm:text-6xl tracking-tight">{t("marketplace.title")}</h1>
         <div className="mt-5 h-[3px] w-10 rounded-full bg-primary" />
       </div>
 
@@ -163,7 +176,7 @@ export default function MarketplacePage() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40 pointer-events-none" />
         <input
           type="text"
-          placeholder="Search products, sellers, or locations…"
+          placeholder={t("marketplace.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full h-12 pl-10 pr-4 rounded-xl bg-muted/40 border border-border/40 text-sm focus:outline-none focus:bg-background focus:border-border transition-colors placeholder:text-muted-foreground/40"
@@ -172,7 +185,7 @@ export default function MarketplacePage() {
 
       {/* Category tabs */}
       <div className="flex items-center gap-0 border-b border-border mb-10 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
-        {CATEGORIES.map((cat) => (
+        {CATEGORY_KEYS.map((cat) => (
           <button
             key={cat}
             onClick={() => setCategory(cat)}
@@ -182,7 +195,7 @@ export default function MarketplacePage() {
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            {cat}
+            {t(CATEGORY_I18N[cat])}
           </button>
         ))}
       </div>
@@ -190,7 +203,7 @@ export default function MarketplacePage() {
       {/* Results count */}
       {!loading && (
         <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">
-          {filtered.length} {filtered.length === 1 ? "product" : "products"}
+          {filtered.length} {filtered.length === 1 ? t("marketplace.product") : t("marketplace.products")}
         </p>
       )}
 
@@ -201,17 +214,17 @@ export default function MarketplacePage() {
         </div>
       ) : filtered.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
+          {filtered.map((p) => <ProductCard key={p.id} product={p} t={t} />)}
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-border py-20 text-center">
-          <p className="text-sm text-muted-foreground">No products found.</p>
+          <p className="text-sm text-muted-foreground">{t("marketplace.noProducts")}</p>
           {(search || category !== "All") && (
             <button
               onClick={() => { setSearch(""); setCategory("All"); }}
               className="text-primary text-sm font-medium mt-2 hover:underline"
             >
-              Clear filters
+              {t("marketplace.clearFilters")}
             </button>
           )}
         </div>

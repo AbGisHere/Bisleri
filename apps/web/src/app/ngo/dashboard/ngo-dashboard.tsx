@@ -6,6 +6,7 @@ import type { Route } from "next";
 import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
 import type { Session } from "@/lib/types";
+import { useLocale } from "@/lib/i18n";
 
 interface NgoStats {
   workshops: number;
@@ -14,6 +15,7 @@ interface NgoStats {
 }
 
 export default function NgoDashboard({ session }: { session: Session }) {
+  const { t } = useLocale();
   const [stats, setStats] = useState<NgoStats | null>(null);
 
   useEffect(() => {
@@ -26,33 +28,33 @@ export default function NgoDashboard({ session }: { session: Session }) {
   const workspaceItems: WorkspaceItem[] = [
     {
       icon: CalendarDays,
-      title: "Schedule Workshops",
-      desc: "Plan & manage skill workshops",
-      tag: stats ? `${stats.workshops} total` : "…",
+      title: t("ngo.scheduleWorkshops"),
+      desc: t("ngo.scheduleWorkshopsDesc"),
+      tag: stats ? `${stats.workshops} ${t("ngo.total")}` : "…",
       color: "primary",
       href: "/ngo/workshops" as Route,
     },
     {
       icon: GraduationCap,
-      title: "Skill Programs",
-      desc: "Create and track skill curricula",
-      tag: stats ? `${stats.programs} active` : "…",
+      title: t("ngo.skillPrograms"),
+      desc: t("ngo.skillProgramsDesc"),
+      tag: stats ? `${stats.programs} ${t("ngo.activePrograms")}` : "…",
       color: "primary",
       href: "/ngo/programs" as Route,
     },
     {
       icon: Users,
-      title: "Connect Women",
-      desc: "Network of women in your area",
-      tag: stats ? `${stats.enrollees} enrolled` : "…",
+      title: t("ngo.connectWomen"),
+      desc: t("ngo.connectWomenDesc"),
+      tag: stats ? `${stats.enrollees} ${t("ngo.enrolled")}` : "…",
       color: "accent",
       href: "/ngo/connect" as Route,
     },
     {
       icon: BookOpen,
-      title: "Resource Library",
-      desc: "Guides, templates, materials",
-      tag: "Browse",
+      title: t("ngo.resourceLibrary"),
+      desc: t("ngo.resourceLibraryDesc"),
+      tag: t("ngo.browse"),
       color: "accent",
       href: "/ngo/resources" as Route,
     },
@@ -64,12 +66,12 @@ export default function NgoDashboard({ session }: { session: Session }) {
       accentColor="bg-forest"
       cta={{
         icon: CalendarDays,
-        title: "Schedule a Workshop",
-        desc: "Plan your next skill session",
+        title: t("ngo.scheduleWorkshop"),
+        desc: t("ngo.scheduleWorkshopDesc"),
         href: "/ngo/workshops" as Route,
       }}
       workspaceItems={workspaceItems}
-      emptyActivityMessage="No activity yet. Start by scheduling a workshop."
+      emptyActivityMessage={t("ngo.emptyActivity")}
     />
   );
 }

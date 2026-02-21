@@ -4,18 +4,20 @@ import { useState } from "react";
 
 import SignInForm from "@/components/sign-in-form";
 import SignUpForm from "@/components/sign-up-form";
+import { useLocale } from "@/lib/i18n";
 
 export default function LoginPage() {
   const [showSignIn, setShowSignIn] = useState(true);
+  const { t } = useLocale();
 
   return (
     <div className="min-h-[calc(100svh-4rem)] flex flex-col lg:flex-row">
       <div className="lg:hidden bg-primary text-primary-foreground px-6 py-6 sm:px-12 sm:py-8">
         <h2 className="font-display text-2xl sm:text-3xl font-bold leading-tight">
-          Your craft, amplified.
+          {t("login.tagline")}
         </h2>
         <p className="text-primary-foreground/80 text-sm sm:text-base mt-2 max-w-sm">
-          AI pricing. SHG connections. A marketplace that works as hard as you do.
+          {t("login.taglineDesc")}
         </p>
       </div>
 
@@ -41,13 +43,10 @@ export default function LoginPage() {
 
           <div className="mt-auto">
             <h2 className="font-display text-5xl font-bold leading-[1.1] mb-6">
-              Your craft,
-              <br />
-              amplified.
+              {t("login.tagline")}
             </h2>
             <p className="text-primary-foreground/80 text-lg max-w-xs leading-relaxed">
-              AI pricing. SHG connections. A marketplace that works as hard as
-              you do.
+              {t("login.taglineDesc")}
             </p>
           </div>
         </div>
