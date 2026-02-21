@@ -64,10 +64,10 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform">
-              <span className="text-primary-foreground font-bold text-sm">R</span>
+            <div className="w-9 h-9 rounded-xl overflow-hidden group-hover:scale-105 transition-transform">
+              <img src="/rangaayan-logo.jpg" alt="Rangaayan" className="w-full h-full object-cover" />
             </div>
-            <span className="font-brand text-xl font-semibold tracking-tight">
+            <span className="text-xl font-semibold tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
               <span className="text-primary">R</span>angaayan
             </span>
           </Link>
