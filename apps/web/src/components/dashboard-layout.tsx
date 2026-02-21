@@ -34,6 +34,7 @@ interface DashboardLayoutProps {
   cta: DashboardCTA;
   workspaceItems: WorkspaceItem[];
   emptyActivityMessage: string;
+  children?: ReactNode;
 }
 
 export default function DashboardLayout({
@@ -42,6 +43,7 @@ export default function DashboardLayout({
   cta,
   workspaceItems,
   emptyActivityMessage,
+  children,
 }: DashboardLayoutProps) {
   const firstName = (session.user.name || "there").split(" ")[0];
   const hour = new Date().getHours();
@@ -163,6 +165,8 @@ export default function DashboardLayout({
           ))}
         </div>
       </div>
+
+      {children}
 
       <div>
         <h2 className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-5">

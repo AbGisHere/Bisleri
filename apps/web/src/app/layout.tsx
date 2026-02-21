@@ -46,8 +46,8 @@ export default function RootLayout({
               <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <span className="font-brand text-lg font-semibold text-foreground">
-                      <span className="text-primary">R</span>angaayan
+                    <span className="font-brand text-lg font-semibold tracking-[-0.01em] text-foreground">
+                      Rangaayan
                     </span>
                     <p className="text-sm text-muted-foreground mt-1">
                       Empowering rural women entrepreneurs across India
