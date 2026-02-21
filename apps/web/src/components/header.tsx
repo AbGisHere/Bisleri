@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { Menu, X, ShoppingCart, MessageCircle } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 import { authClient } from "@/lib/auth-client";
@@ -38,6 +38,7 @@ export default function Header() {
   }, [pathname, closeMobileMenu]);
 
   const [cartCount, setCartCount] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const role = session?.user?.role || "seller";
   const isBuyerRoute = pathname.startsWith("/buyer");
   const showCart = role === "buyer" || isBuyerRoute;
@@ -49,6 +50,19 @@ export default function Header() {
       .then((d) => setCartCount(d.cart ?? 0))
       .catch(() => {});
   }, [showCart, session]);
+
+  useEffect(() => {
+    if (!session) return;
+    const fetchUnread = () => {
+      fetch("/api/messages/unread")
+        .then((r) => r.json())
+        .then((d) => setUnreadMessages(d.unread ?? 0))
+        .catch(() => {});
+    };
+    fetchUnread();
+    const timer = setInterval(fetchUnread, 15000);
+    return () => clearInterval(timer);
+  }, [session]);
 
   const dashboardHref =
     !session
@@ -120,6 +134,21 @@ export default function Header() {
                 {cartCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
                     {cartCount > 9 ? "9+" : cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+            {session && (
+              <Link
+                href="/messages"
+                className="relative w-9 h-9 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-xl flex items-center justify-center transition-all duration-200 hover:bg-primary/15 hover:border-primary/25"
+                title={t("chat.messages")}
+                style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.06)' }}
+              >
+                <MessageCircle className="w-4 h-4 text-foreground/70" />
+                {unreadMessages > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadMessages > 9 ? "9+" : unreadMessages}
                   </span>
                 )}
               </Link>

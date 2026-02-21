@@ -6,6 +6,7 @@ import { wishlist } from "@bisleri/db/schema/wishlist";
 import { cart } from "@bisleri/db/schema/cart";
 import { workshop, enrollment } from "@bisleri/db/schema/workshops";
 import { program } from "@bisleri/db/schema/programs";
+import { message } from "@bisleri/db/schema/messages";
 import { eq, and, count, ne } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -19,6 +20,13 @@ export async function GET() {
   }
 
   try {
+    // Unread messages count (shared across all roles)
+    const [unreadResult] = await db
+      .select({ count: count() })
+      .from(message)
+      .where(and(eq(message.receiverId, session.user.id), eq(message.read, false)));
+    const unreadMessages = unreadResult?.count ?? 0;
+
     if (session.user.role === "seller") {
       const [productsResult] = await db
         .select({ count: count() })
@@ -39,6 +47,7 @@ export async function GET() {
       return NextResponse.json({
         products: productsResult?.count ?? 0,
         activeOrders: activeOrdersResult?.count ?? 0,
+        unreadMessages,
       });
     }
 
@@ -59,6 +68,7 @@ export async function GET() {
         workshops: workshopsResult?.count ?? 0,
         programs: programsResult?.count ?? 0,
         enrollees: enrollees.length,
+        unreadMessages,
       });
     }
 
@@ -73,6 +83,7 @@ export async function GET() {
       orders: ordersResult?.count ?? 0,
       wishlist: wishlistResult?.count ?? 0,
       cart: cartResult?.count ?? 0,
+      unreadMessages,
     });
   } catch (err) {
     console.error("[GET /api/stats]", err);

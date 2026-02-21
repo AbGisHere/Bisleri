@@ -5,3 +5,4 @@ export * from "./wishlist";
 export * from "./cart";
 export * from "./workshops";
 export * from "./programs";
+export * from "./messages";

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, MapPin, CheckCircle2, Users } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle2, Users, MessageCircle } from "lucide-react";
+import type { Route } from "next";
 import Link from "next/link";
 
 interface Ngo {
@@ -213,6 +214,15 @@ export default function NgoDetailClient({ ngoId }: { ngoId: string }) {
             ))}
           </div>
         )}
+
+        <Link
+          href={`/messages/${ngoId}` as Route}
+          className="inline-flex items-center gap-2 mt-5 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:translate-y-px transition-all"
+          style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2), 0 3px 10px rgba(0,0,0,0.12)' }}
+        >
+          <MessageCircle className="w-4 h-4" />
+          Message
+        </Link>
       </div>
 
       {/* ── Enroll error ──────────────────────────────────────────────────── */}

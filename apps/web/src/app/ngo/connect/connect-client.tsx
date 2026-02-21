@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, User } from "lucide-react";
+import { ArrowLeft, MapPin, User, MessageCircle } from "lucide-react";
+import type { Route } from "next";
 import Link from "next/link";
 import type { Session } from "@/lib/types";
 
@@ -144,6 +145,13 @@ export default function ConnectClient({ session: _session }: { session: Session 
                           ))}
                         </div>
                       )}
+                      <Link
+                        href={`/messages/${seller.userId}` as Route}
+                        className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Message
+                      </Link>
                     </div>
                   ))}
                 </div>

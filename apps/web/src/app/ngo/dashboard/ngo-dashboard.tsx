@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarDays, GraduationCap, Users, BookOpen } from "lucide-react";
+import { CalendarDays, GraduationCap, Users, BookOpen, MessageCircle } from "lucide-react";
 import type { Route } from "next";
 import DashboardLayout from "@/components/dashboard-layout";
 import type { WorkspaceItem } from "@/components/dashboard-layout";
@@ -12,6 +12,7 @@ interface NgoStats {
   workshops: number;
   programs: number;
   enrollees: number;
+  unreadMessages?: number;
 }
 
 export default function NgoDashboard({ session }: { session: Session }) {
@@ -49,6 +50,14 @@ export default function NgoDashboard({ session }: { session: Session }) {
       tag: stats ? `${stats.enrollees} ${t("ngo.enrolled")}` : "…",
       color: "accent",
       href: "/ngo/connect" as Route,
+    },
+    {
+      icon: MessageCircle,
+      title: t("chat.messagesWorkspace"),
+      desc: t("chat.messagesWorkspaceDesc"),
+      tag: stats ? `${stats.unreadMessages ?? 0} ${t("chat.unread")}` : "…",
+      color: "accent",
+      href: "/messages" as Route,
     },
     {
       icon: BookOpen,

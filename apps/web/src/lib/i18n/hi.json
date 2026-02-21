@@ -282,5 +282,14 @@
   "addProduct.demandForecast": "माँग पूर्वानुमान",
   "addProduct.listing": "लिस्ट हो रहा है…",
   "addProduct.listProduct": "उत्पाद लिस्ट करें",
-  "addProduct.cancel": "रद्द करें"
+  "addProduct.cancel": "रद्द करें",
+
+  "chat.messages": "संदेश",
+  "chat.placeholder": "संदेश लिखें…",
+  "chat.noConversations": "अभी कोई बातचीत नहीं। किसी NGO या विक्रेता को संदेश भेजकर शुरू करें।",
+  "chat.startConversation": "बातचीत शुरू करने के लिए संदेश भेजें।",
+  "chat.message": "संदेश",
+  "chat.messagesWorkspace": "संदेश",
+  "chat.messagesWorkspaceDesc": "NGO और विक्रेताओं से चैट करें",
+  "chat.unread": "अपठित"
 }

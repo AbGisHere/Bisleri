@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Plus, Users, TrendingUp, Search } from "lucide-react";
+import { Plus, Users, TrendingUp, Search, MessageCircle } from "lucide-react";
 import TruckElectricIcon from "@/components/ui/truck-electric-icon";
 import ScanBarcodeIcon from "@/components/ui/scan-barcode-icon";
 import type { Route } from "next";
@@ -79,6 +79,14 @@ export default function SellerDashboard({ session }: { session: Session }) {
       tag: t("seller.explore"),
       color: "accent",
       href: "/seller/ngos" as Route,
+    },
+    {
+      icon: MessageCircle,
+      title: t("chat.messagesWorkspace"),
+      desc: t("chat.messagesWorkspaceDesc"),
+      tag: stats ? `${(stats as any).unreadMessages ?? 0} ${t("chat.unread")}` : "…",
+      color: "accent",
+      href: "/messages" as Route,
     },
   ];
 
