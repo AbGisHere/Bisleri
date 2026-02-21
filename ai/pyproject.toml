@@ -1,5 +1,5 @@
 [project]
-name = "bisleri-ai"
+name = "rangaayan-ai"
 version = "0.1.0"
 description = "AI services for rural women entrepreneurship marketplace"
 requires-python = ">=3.11"
@@ -15,7 +15,6 @@ dependencies = [
     "Pillow>=10.0.0",
     "openai>=1.58.0",
     "httpx>=0.28.0",
-    "beautifulsoup4>=4.12.0",
     "selectolax>=0.3.27",
     "fake-useragent>=2.0.0",
     "pandas>=2.2.0",
@@ -23,6 +22,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "loguru>=0.7.0",
     "tqdm>=4.66.0",
+    "ddgs>=9.10.0",
 ]
 
 [tool.uv]
